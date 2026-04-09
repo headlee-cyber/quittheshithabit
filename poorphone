@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0c0c10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Mindful — スマホ依存を断つ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0c10;
+  --surface: #131318;
+  --surface2: #1a1a22;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f0eff5;
+  --text2: rgba(240,239,245,0.55);
+  --text3: rgba(240,239,245,0.3);
+  --accent: #8b7cf8;
+  --accent2: #6c5ce7;
+  --green: #00d68f;
+  --amber: #ffb347;
+  --red: #ff6b6b;
+  --pink: #f8a4c0;
+  --r: 14px;
+  --r-sm: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  max-width: 430px;
+  margin: 0 auto;
+  position: relative;
+  padding-bottom: 80px;
+}
+
+/* NAV */
+.nav {
+  position: fixed;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  background: rgba(13,13,18,0.92);
+  backdrop-filter: blur(20px);
+  border-top: 0.5px solid var(--border2);
+  display: flex;
+  z-index: 100;
+  padding: 0 8px;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 4px 8px;
+  cursor: pointer;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 10px;
+  transition: color 0.2s;
+}
+
+.nav-item.active { color: var(--accent); }
+
+.nav-icon {
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* PAGES */
+.page { display: none; padding: 0 16px; animation: fadeIn 0.2s ease; }
+.page.active { display: block; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* HEADER */
+.header {
+  padding: 56px 0 8px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.header-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  color: var(--text);
+  line-height: 1.1;
+}
+
+.header-date {
+  font-size: 12px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  padding-bottom: 4px;
+}
+
+/* HERO RING */
+.ring-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 0 24px;
+}
+
+.ring-wrap {
+  position: relative;
+  width: 180px; height: 180px;
+}
+
+.ring-wrap svg { position: absolute; top: 0; left: 0; }
+
+.ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.ring-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 32px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -1px;
+}
+
+.ring-label {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.08em;
+}
+
+.ring-goal {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.ring-goal span { color: var(--green); font-weight: 500; }
+
+/* CARDS */
+.card {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-label {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.card-sub {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+/* TRIGGER BUTTONS */
+.trigger-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.trigger-btn {
+  background: var(--surface2);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 10px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+.trigger-btn:active { transform: scale(0.95); }
+
+.trigger-btn.selected {
+  background: rgba(139,124,248,0.15);
+  border-color: rgba(139,124,248,0.4);
+}
+
+.trigger-emoji { font-size: 20px; }
+.trigger-label { font-size: 10px; color: var(--text2); }
+
+/* STREAK */
+.streak-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.streak-day {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--surface2);
+  border: 0.5px solid var(--border);
+  color: var(--text3);
+}
+
+.streak-day.done {
+  background: rgba(0,214,143,0.15);
+  border-color: rgba(0,214,143,0.35);
+  color: var(--green);
+}
+
+.streak-day.today {
+  background: rgba(139,124,248,0.2);
+  border-color: rgba(139,124,248,0.5);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* STATS ROW */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 12px;
+  text-align: center;
+}
+
+.stat-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.stat-key { font-size: 10px; color: var(--text3); }
+
+/* LOG ITEM */
+.log-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.log-item:last-child { border-bottom: none; }
+
+.log-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.log-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text3);
+  min-width: 40px;
+}
+
+.log-text { font-size: 13px; color: var(--text2); flex: 1; }
+.log-trigger {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--surface2);
+  color: var(--text2);
+  white-space: nowrap;
+}
+
+/* CHALLENGE */
+.mission-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 0.5px solid var(--border);
+  cursor: pointer;
+}
+
+.mission-item:last-child { border-bottom: none; }
+
+.mission-check {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: all 0.2s;
+}
+
+.mission-check.done {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.mission-body { flex: 1; }
+.mission-title { font-size: 14px; margin-bottom: 3px; }
+.mission-title.done { text-decoration: line-through; color: var(--text3); }
+.mission-desc { font-size: 12px; color: var(--text3); }
+
+/* AI CARD */
+.ai-card {
+  background: linear-gradient(135deg, rgba(108,92,231,0.15) 0%, rgba(139,124,248,0.08) 100%);
+  border: 0.5px solid rgba(139,124,248,0.25);
+  border-radius: var(--r);
+  padding: 18px;
+  margin-bottom: 12px;
+}
+
+.ai-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ai-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.ai-name { font-size: 11px; color: var(--accent); letter-spacing: 0.1em; }
+
+.ai-text {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  margin-bottom: 14px;
+}
+
+.ai-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ai-action {
+  background: rgba(139,124,248,0.15);
+  border: 0.5px solid rgba(139,124,248,0.3);
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-size: 12px;
+  color: var(--accent);
+  cursor: pointer;
+  font-family: 'Noto Sans JP', sans-serif;
+  transition: background 0.15s;
+}
+
+.ai-action:active { background: rgba(139,124,248,0.3); }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border-top: 0.5px solid var(--border2);
+  border-radius: 20px 20px 0 0;
+  padding: 24px 20px 40px;
+  width: 100%;
+  max-width: 430px;
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+.modal-handle {
+  width: 36px; height: 4px;
+  background: var(--border2);
+  border-radius: 2px;
+  margin: 0 auto 20px;
+}
+
+.modal-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+
+.modal-sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; line-height: 1.6; }
+
+/* INPUT */
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface2);
+  border: 0.5px solid var(--border2);
+  border-radius: var(--r-sm);
+  padding: 4px 4px 4px 14px;
+  margin-bottom: 12px;
+}
+
+.input-row input {
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 14px;
+  font-family: 'Noto Sans JP', sans-serif;
+  flex: 1;
+  padding: 8px 0;
+}
+
+.input-row input::placeholder { color: var(--text3); }
+
+.btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'Noto Sans JP', sans-serif;
+  width: 100%;
+  transition: background 0.15s;
+}
+
+.btn:active { background: var(--accent2); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text2);
+  border: 0.5px solid var(--border2);
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: 'Noto Sans JP', sans-serif;
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* PREMIUM BANNER */
+.premium-banner {
+  background: linear-gradient(135deg, #1a1530, #231d3d);
+  border: 0.5px solid rgba(139,124,248,0.2);
+  border-radius: var(--r);
+  padding: 18px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.premium-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.premium-text h4 { font-size: 14px; margin-bottom: 3px; }
+.premium-text p { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+.badge-premium {
+  background: rgba(139,124,248,0.2);
+  color: var(--accent);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* PROFILE */
+.profile-avatar {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent2), var(--pink));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: 12px;
+}
+
+.section-sep {
+  height: 0.5px;
+  background: var(--border);
+  margin: 16px 0;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 0;
+  border-bottom: 0.5px solid var(--border);
+  cursor: pointer;
+}
+
+.setting-row:last-child { border-bottom: none; }
+.setting-label { font-size: 14px; }
+.setting-val { font-size: 13px; color: var(--text3); }
+
+.toggle {
+  width: 44px; height: 26px;
+  background: var(--surface2);
+  border-radius: 13px;
+  border: 0.5px solid var(--border2);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toggle.on { background: var(--accent); border-color: var(--accent); }
+
+.toggle-knob {
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 20px; height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+.toggle.on .toggle-knob { transform: translateX(18px); }
+
+/* NOTIFICATION TOAST */
+.toast {
+  position: fixed;
+  top: 60px; left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: var(--surface);
+  border: 0.5px solid var(--border2);
+  border-radius: 30px;
+  padding: 10px 20px;
+  font-size: 13px;
+  color: var(--text);
+  z-index: 300;
+  opacity: 0;
+  transition: all 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* CHART MINI */
+.chart-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 60px;
+  margin: 8px 0;
+}
+
+.bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.bar {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  background: rgba(139,124,248,0.25);
+  transition: height 0.3s ease;
+}
+
+.bar.today { background: rgba(139,124,248,0.7); }
+.bar.good { background: rgba(0,214,143,0.4); }
+
+.bar-day { font-size: 10px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
+
+/* PROGRESS BAR */
+.progress-track {
+  height: 6px;
+  background: var(--surface2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 8px 0 4px;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--accent2), var(--accent));
+  transition: width 0.5s ease;
+}
+
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- PAGE: HOME -->
+<div class="page active" id="page-home">
+  <div class="header">
+    <div>
+      <div class="header-date" id="today-date">2025.06.14 SAT</div>
+      <div class="header-title">おはよう、<br>今日も頑張ろう</div>
+    </div>
+    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#6c5ce7,#f8a4c0);display:flex;align-items:center;justify-content:center;font-size:18px;">🌿</div>
+  </div>
+
+  <!-- RING -->
+  <div class="ring-container">
+    <div class="ring-wrap">
+      <svg width="180" height="180" viewBox="0 0 180 180">
+        <circle cx="90" cy="90" r="75" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="12"/>
+        <circle cx="90" cy="90" r="75" fill="none" stroke="rgba(139,124,248,0.15)" stroke-width="12"
+          stroke-dasharray="471" stroke-dashoffset="0" stroke-linecap="round"
+          transform="rotate(-90 90 90)"/>
+        <circle cx="90" cy="90" r="75" fill="none" stroke="url(#grad)" stroke-width="12"
+          stroke-dasharray="471" stroke-dashoffset="200" stroke-linecap="round"
+          transform="rotate(-90 90 90)" id="progress-ring"/>
+        <defs>
+          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#6c5ce7"/>
+            <stop offset="100%" stop-color="#8b7cf8"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="ring-center">
+        <div class="ring-time" id="screen-time">2:34</div>
+        <div class="ring-label">TODAY'S USE</div>
+      </div>
+    </div>
+    <div class="ring-goal">目標 <span>3時間</span> まであと <span id="remaining">26分</span></div>
+  </div>
+
+  <!-- AI SUGGESTION -->
+  <div class="ai-card">
+    <div class="ai-header">
+      <div class="ai-dot"></div>
+      <div class="ai-name">MINDFUL AI</div>
+    </div>
+    <div class="ai-text" id="ai-suggestion">今日は「退屈」でスマホを開く回数が多いですね。代わりに深呼吸を3回してみましょう。5分あれば十分です。</div>
+    <div class="ai-actions">
+      <button class="ai-action" onclick="showAlternative()">代替行動を見る</button>
+      <button class="ai-action" onclick="logTrigger()">今の気分を記録</button>
+    </div>
+  </div>
+
+  <!-- BAR CHART -->
+  <div class="card">
+    <div class="card-label">今週のスクリーンタイム</div>
+    <div class="chart-row" id="weekly-chart"></div>
+    <div style="display:flex;justify-content:space-between;margin-top:4px;">
+      <span style="font-size:11px;color:var(--text3)">月</span>
+      <span style="font-size:11px;color:var(--text3)">火</span>
+      <span style="font-size:11px;color:var(--text3)">水</span>
+      <span style="font-size:11px;color:var(--text3)">木</span>
+      <span style="font-size:11px;color:var(--text3)">金</span>
+      <span style="font-size:11px;color:var(--text3)">土</span>
+      <span style="font-size:11px;color:var(--text3)">今日</span>
+    </div>
+  </div>
+
+  <!-- STREAK -->
+  <div class="card">
+    <div class="card-label">連続記録日数</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:500;color:var(--green)">7</div>
+      <div style="font-size:13px;color:var(--text2);">日連続達成中 🔥</div>
+    </div>
+    <div class="streak-row" id="streak-row"></div>
+  </div>
+</div>
+
+<!-- PAGE: LOG -->
+<div class="page" id="page-log">
+  <div class="header">
+    <div class="header-title">依存トリガー<br>記録</div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">今、なぜ手に取りましたか？</div>
+    <div class="card-sub" style="margin-bottom:14px;">正直に選んでください。記録するだけで気づきが生まれます。</div>
+    <div class="trigger-grid" id="trigger-grid">
+      <button class="trigger-btn" onclick="selectTrigger(this,'退屈')">
+        <div class="trigger-emoji">😑</div><div class="trigger-label">退屈</div>
+      </button>
+      <button class="trigger-btn" onclick="selectTrigger(this,'不安')">
+        <div class="trigger-emoji">😰</div><div class="trigger-label">不安・焦り</div>
+      </button>
+      <button class="trigger-btn" onclick="selectTrigger(this,'習慣')">
+        <div class="trigger-emoji">🔄</div><div class="trigger-label">何となく習慣</div>
+      </button>
+      <button class="trigger-btn" onclick="selectTrigger(this,'通知')">
+        <div class="trigger-emoji">🔔</div><div class="trigger-label">通知が来た</div>
+      </button>
+      <button class="trigger-btn" onclick="selectTrigger(this,'暇つぶし')">
+        <div class="trigger-emoji">⏳</div><div class="trigger-label">暇つぶし</div>
+      </button>
+      <button class="trigger-btn" onclick="selectTrigger(this,'孤独')">
+        <div class="trigger-emoji">🫠</div><div class="trigger-label">孤独感</div>
+      </button>
+      <button class="trigger-btn" onclick="selectTrigger(this,'ストレス')">
+        <div class="trigger-emoji">😤</div><div class="trigger-label">ストレス</div>
+      </button>
+      <button class="trigger-btn" onclick="selectTrigger(this,'先延ばし')">
+        <div class="trigger-emoji">🙈</div><div class="trigger-label">先延ばし</div>
+      </button>
+      <button class="trigger-btn" onclick="selectTrigger(this,'その他')">
+        <div class="trigger-emoji">💭</div><div class="trigger-label">その他</div>
+      </button>
+    </div>
+    <button class="btn" style="margin-top:8px;" onclick="saveTriggerLog()">記録する</button>
+  </div>
+
+  <!-- LOG LIST -->
+  <div class="card">
+    <div class="card-label">今日の記録</div>
+    <div id="log-list">
+      <div class="log-item">
+        <div class="log-dot" style="background:var(--amber)"></div>
+        <div class="log-time">08:23</div>
+        <div class="log-text">朝起きてすぐ</div>
+        <div class="log-trigger">習慣</div>
+      </div>
+      <div class="log-item">
+        <div class="log-dot" style="background:var(--red)"></div>
+        <div class="log-time">11:47</div>
+        <div class="log-text">仕事の合間に</div>
+        <div class="log-trigger">ストレス</div>
+      </div>
+      <div class="log-item">
+        <div class="log-dot" style="background:var(--text3)"></div>
+        <div class="log-time">14:02</div>
+        <div class="log-text">食後</div>
+        <div class="log-trigger">退屈</div>
+      </div>
+      <div class="log-item">
+        <div class="log-dot" style="background:var(--accent)"></div>
+        <div class="log-time">16:30</div>
+        <div class="log-text">作業に集中できなくて</div>
+        <div class="log-trigger">先延ばし</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRIGGER ANALYSIS -->
+  <div class="card">
+    <div class="card-label">今週のトリガー分析</div>
+    <div style="margin: 8px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:13px;">習慣・無意識</span>
+        <span style="font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;">38%</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:38%;background:var(--amber)"></div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;margin-top:10px;">
+        <span style="font-size:13px;">退屈・暇つぶし</span>
+        <span style="font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;">27%</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:27%;background:var(--accent)"></div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;margin-top:10px;">
+        <span style="font-size:13px;">ストレス・不安</span>
+        <span style="font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;">20%</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:20%;background:var(--red)"></div></div>
+    </div>
+    <div style="margin-top:12px;padding:12px;background:var(--surface2);border-radius:var(--r-sm);">
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;">💡 <strong style="color:var(--text)">習慣的な使用</strong>が最多です。特に朝起きてすぐと就寝前が危険ゾーン。スマホをベッドの外に置くだけで改善できます。</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: CHALLENGE -->
+<div class="page" id="page-challenge">
+  <div class="header">
+    <div class="header-title">21日間<br>チャレンジ</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);padding-bottom:4px;">DAY 7</div>
+  </div>
+
+  <div style="margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+      <span style="font-size:12px;color:var(--text2)">達成率</span>
+      <span style="font-size:12px;color:var(--accent);font-family:'JetBrains Mono',monospace">7/21日</span>
+    </div>
+    <div class="progress-track" style="height:8px;">
+      <div class="progress-fill" style="width:33%"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">今日のミッション — Day 7</div>
+    <div id="missions">
+      <div class="mission-item" onclick="toggleMission(this)">
+        <div class="mission-check done">
+          <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="#0c0c10" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="mission-body">
+          <div class="mission-title done">朝起きてから30分、スマホを見ない</div>
+          <div class="mission-desc">代わりにコップ1杯の水を飲む</div>
+        </div>
+      </div>
+      <div class="mission-item" onclick="toggleMission(this)">
+        <div class="mission-check done">
+          <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="#0c0c10" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="mission-body">
+          <div class="mission-title done">食事中はスマホを別室に置く</div>
+          <div class="mission-desc">食事に集中すると満足感が上がる</div>
+        </div>
+      </div>
+      <div class="mission-item" onclick="toggleMission(this)">
+        <div class="mission-check"></div>
+        <div class="mission-body">
+          <div class="mission-title">トリガーを3回記録する</div>
+          <div class="mission-desc">気づきが最大の武器になる</div>
+        </div>
+      </div>
+      <div class="mission-item" onclick="toggleMission(this)">
+        <div class="mission-check"></div>
+        <div class="mission-body">
+          <div class="mission-title">就寝1時間前にスマホをオフ</div>
+          <div class="mission-desc">睡眠の質が劇的に改善される</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEK GRID -->
+  <div class="card">
+    <div class="card-label">21日間の記録</div>
+    <div id="challenge-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:8px;"></div>
+  </div>
+
+  <div class="premium-banner">
+    <div class="premium-icon">✨</div>
+    <div class="premium-text">
+      <h4>プレミアムで全機能解放</h4>
+      <p>AIパーソナルアドバイス・詳細分析・コミュニティ</p>
+    </div>
+    <div class="badge-premium">¥700/月</div>
+  </div>
+</div>
+
+<!-- PAGE: PROFILE -->
+<div class="page" id="page-profile">
+  <div class="header">
+    <div class="header-title">プロフィール</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;align-items:center;padding:8px 0 24px;">
+    <div class="profile-avatar">🌿</div>
+    <div style="font-size:18px;font-weight:500;margin-bottom:4px;">ゲストユーザー</div>
+    <div style="font-size:13px;color:var(--text2);">7日間継続中 · フリープラン</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-val" style="color:var(--green)">7</div>
+      <div class="stat-key">連続日数</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" style="color:var(--accent)">2.5h</div>
+      <div class="stat-key">平均削減</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" style="color:var(--amber)">24</div>
+      <div class="stat-key">記録回数</div>
+    </div>
+  </div>
+
+  <div class="premium-banner" style="cursor:pointer;" onclick="showToast('プレミアム機能は近日公開予定です！')">
+    <div class="premium-icon">👑</div>
+    <div class="premium-text">
+      <h4>プレミアムにアップグレード</h4>
+      <p>7日間無料でお試しください。いつでもキャンセル可能。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">設定</div>
+    <div class="setting-row">
+      <span class="setting-label">毎日のリマインダー</span>
+      <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
+    </div>
+    <div class="setting-row">
+      <span class="setting-label">目標スクリーンタイム</span>
+      <span class="setting-val">3時間 ›</span>
+    </div>
+    <div class="setting-row">
+      <span class="setting-label">週次レポート</span>
+      <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
+    </div>
+    <div class="setting-row">
+      <span class="setting-label">ダークモード</span>
+      <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
+    </div>
+    <div class="setting-row" onclick="showToast('ログアウトしました')">
+      <span class="setting-label" style="color:var(--red)">ログアウト</span>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="nav">
+  <button class="nav-item active" onclick="switchPage('home',this)">
+    <div class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M3 9.5L11 3L19 9.5V19a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/></svg>
+    </div>ホーム
+  </button>
+  <button class="nav-item" onclick="switchPage('log',this)">
+    <div class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="3" width="16" height="16" rx="3"/>
+        <path d="M7 8h8M7 12h8M7 16h4"/></svg>
+    </div>記録
+  </button>
+  <button class="nav-item" onclick="switchPage('challenge',this)">
+    <div class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M11 2L13.5 8.5H20L14.5 12.5L16.5 19L11 15L5.5 19L7.5 12.5L2 8.5H8.5L11 2Z"/></svg>
+    </div>チャレンジ
+  </button>
+  <button class="nav-item" onclick="switchPage('profile',this)">
+    <div class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="11" cy="8" r="4"/>
+        <path d="M3 19c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    </div>マイページ
+  </button>
+</nav>
+
+<!-- MODAL: ALTERNATIVE ACTIONS -->
+<div class="modal-overlay" id="modal-alt">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">今できる代替行動</div>
+    <div class="modal-sub">スマホの代わりに試してみましょう。どれか一つでも十分です。</div>
+    <div id="alt-actions">
+      <div class="card" style="margin-bottom:10px;">
+        <div style="font-size:22px;margin-bottom:8px;">🌬️</div>
+        <div class="card-title">4-7-8呼吸法</div>
+        <div class="card-sub">4秒吸って、7秒止めて、8秒で吐く。3回繰り返すと落ち着く。</div>
+      </div>
+      <div class="card" style="margin-bottom:10px;">
+        <div style="font-size:22px;margin-bottom:8px;">🚶</div>
+        <div class="card-title">5分間散歩</div>
+        <div class="card-sub">外に出て空を見るだけで気分がリセットされる。</div>
+      </div>
+      <div class="card" style="margin-bottom:16px;">
+        <div style="font-size:22px;margin-bottom:8px;">📝</div>
+        <div class="card-title">3つの感謝を書く</div>
+        <div class="card-sub">今日良かったことを3つメモするだけで幸福感が上がる。</div>
+      </div>
+    </div>
+    <button class="btn-ghost" onclick="closeModal('modal-alt')">閉じる</button>
+  </div>
+</div>
+
+<!-- MODAL: LOG TRIGGER -->
+<div class="modal-overlay" id="modal-log">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">今の気分を記録</div>
+    <div class="modal-sub">何が今スマホを開かせましたか？記録するだけで意識が変わります。</div>
+    <div class="trigger-grid" id="modal-trigger-grid">
+      <button class="trigger-btn" onclick="selectModalTrigger(this,'退屈')"><div class="trigger-emoji">😑</div><div class="trigger-label">退屈</div></button>
+      <button class="trigger-btn" onclick="selectModalTrigger(this,'不安')"><div class="trigger-emoji">😰</div><div class="trigger-label">不安</div></button>
+      <button class="trigger-btn" onclick="selectModalTrigger(this,'習慣')"><div class="trigger-emoji">🔄</div><div class="trigger-label">習慣</div></button>
+      <button class="trigger-btn" onclick="selectModalTrigger(this,'ストレス')"><div class="trigger-emoji">😤</div><div class="trigger-label">ストレス</div></button>
+      <button class="trigger-btn" onclick="selectModalTrigger(this,'孤独')"><div class="trigger-emoji">🫠</div><div class="trigger-label">孤独</div></button>
+      <button class="trigger-btn" onclick="selectModalTrigger(this,'先延ばし')"><div class="trigger-emoji">🙈</div><div class="trigger-label">先延ばし</div></button>
+    </div>
+    <div style="height:12px;"></div>
+    <button class="btn" onclick="saveModalTrigger()">記録して閉じる</button>
+    <button class="btn-ghost" onclick="closeModal('modal-log')">キャンセル</button>
+  </div>
+</div>
+
+<script>
+const days = ['月','火','水','木','金','土','今'];
+const hours = [3.5, 2.8, 4.2, 3.1, 2.6, 3.8, 2.6];
+const maxH = Math.max(...hours);
+
+const chart = document.getElementById('weekly-chart');
+days.forEach((d, i) => {
+  const pct = Math.round((hours[i] / maxH) * 100);
+  const isToday = i === 6;
+  const isGood = hours[i] <= 3;
+  const div = document.createElement('div');
+  div.className = 'bar-wrap';
+  div.innerHTML = `<div class="bar${isToday?' today':isGood?' good':''}" style="height:${pct}%"></div>`;
+  chart.appendChild(div);
+});
+
+const streakRow = document.getElementById('streak-row');
+['月','火','水','木','金','土','今'].forEach((d, i) => {
+  const el = document.createElement('div');
+  el.className = 'streak-day' + (i < 6 ? ' done' : ' today');
+  el.textContent = d;
+  streakRow.appendChild(el);
+});
+
+const cgrid = document.getElementById('challenge-grid');
+for (let i = 1; i <= 21; i++) {
+  const el = document.createElement('div');
+  el.className = 'streak-day' + (i < 7 ? ' done' : i === 7 ? ' today' : '');
+  el.style.cssText = 'width:100%;height:32px;border-radius:6px;';
+  el.textContent = i;
+  cgrid.appendChild(el);
+}
+
+const now = new Date();
+const dateEl = document.getElementById('today-date');
+const days2 = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+dateEl.textContent = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${days2[now.getDay()]}`;
+
+function switchPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+let selectedTrigger = null;
+let modalTrigger = null;
+
+function selectTrigger(el, name) {
+  document.querySelectorAll('#trigger-grid .trigger-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedTrigger = name;
+}
+
+function selectModalTrigger(el, name) {
+  document.querySelectorAll('#modal-trigger-grid .trigger-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  modalTrigger = name;
+}
+
+function saveTriggerLog() {
+  if (!selectedTrigger) { showToast('トリガーを選んでください'); return; }
+  const list = document.getElementById('log-list');
+  const t = new Date();
+  const time = `${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;
+  const colors = {退屈:'var(--text3)',不安:'var(--accent)',習慣:'var(--amber)',通知:'var(--green)',暇つぶし:'var(--text3)',孤独:'var(--pink)',ストレス:'var(--red)',先延ばし:'var(--amber)',その他:'var(--text3)'};
+  const item = document.createElement('div');
+  item.className = 'log-item';
+  item.innerHTML = `<div class="log-dot" style="background:${colors[selectedTrigger]||'var(--text3)'}"></div><div class="log-time">${time}</div><div class="log-text">今記録</div><div class="log-trigger">${selectedTrigger}</div>`;
+  list.insertBefore(item, list.firstChild);
+  document.querySelectorAll('#trigger-grid .trigger-btn').forEach(b => b.classList.remove('selected'));
+  selectedTrigger = null;
+  showToast('✓ 記録しました！');
+}
+
+function saveModalTrigger() {
+  if (!modalTrigger) { showToast('トリガーを選んでください'); return; }
+  closeModal('modal-log');
+  showToast(`✓ 「${modalTrigger}」を記録しました`);
+}
+
+function showAlternative() { document.getElementById('modal-alt').classList.add('open'); }
+function logTrigger() { document.getElementById('modal-log').classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+function toggleMission(el) {
+  const check = el.querySelector('.mission-check');
+  const title = el.querySelector('.mission-title');
+  const isDone = check.classList.contains('done');
+  if (isDone) {
+    check.classList.remove('done');
+    check.innerHTML = '';
+    title.classList.remove('done');
+  } else {
+    check.classList.add('done');
+    check.innerHTML = `<svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="#0c0c10" stroke-width="2" stroke-linecap="round"/></svg>`;
+    title.classList.add('done');
+    showToast('ミッション達成！🎉');
+  }
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+const suggestions = [
+  '今日は「退屈」でスマホを開く回数が多いですね。代わりに深呼吸を3回してみましょう。',
+  'スクリーンタイムが昨日より15分少ないです。この調子を続けましょう！',
+  '夜21時以降のスマホ使用が睡眠を妨げています。今夜は早めに置きましょう。',
+  '「先延ばし」のトリガーが多いです。今すぐ5分だけ作業を始めてみて。',
+];
+document.getElementById('ai-suggestion').textContent = suggestions[Math.floor(Math.random() * suggestions.length)];
+</script>
+</body>
+</html>
