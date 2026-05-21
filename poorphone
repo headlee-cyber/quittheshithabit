@@ -55,7 +55,7 @@ body {
   border-top: 0.5px solid var(--border2);
   display: flex;
   z-index: 100;
-  padding: 0 8px;
+  padding: 0 4px;
   padding-bottom: env(safe-area-inset-bottom);
 }
 
@@ -64,7 +64,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px 4px 8px;
+  padding: 10px 2px 8px;
   cursor: pointer;
   gap: 4px;
   background: none;
@@ -76,6 +76,7 @@ body {
 }
 
 .nav-item.active { color: var(--accent); }
+.nav-item.focus-active { color: var(--green); }
 
 .nav-icon {
   width: 24px; height: 24px;
@@ -657,6 +658,261 @@ body {
   transition: width 0.5s ease;
 }
 
+/* ===== FOCUS PAGE ===== */
+.focus-state { display: none; }
+.focus-state.active { display: block; }
+
+.focus-setup-header {
+  padding: 48px 0 12px;
+  text-align: center;
+}
+
+.plant-selector {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.plant-opt {
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 6px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+.plant-opt:active { transform: scale(0.95); }
+
+.plant-opt.selected {
+  border-color: var(--green);
+  background: rgba(0,214,143,0.08);
+}
+
+.plant-opt-emoji { font-size: 28px; margin-bottom: 5px; }
+.plant-opt-name { font-size: 11px; color: var(--text2); }
+
+.duration-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.dur-btn {
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 14px 4px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.dur-btn:active { transform: scale(0.95); }
+
+.dur-btn.selected {
+  border-color: var(--accent);
+  background: rgba(139,124,248,0.12);
+  color: var(--accent);
+}
+
+.dur-btn span { font-size: 10px; color: inherit; opacity: 0.7; font-family: 'Noto Sans JP', sans-serif; font-weight: 400; }
+
+/* Running session */
+.session-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 0 16px;
+}
+
+.plant-stage-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.session-ring {
+  position: absolute;
+  top: 0; left: 0;
+  pointer-events: none;
+}
+
+.plant-emoji-large {
+  font-size: 72px;
+  transition: transform 1s ease, filter 0.5s ease;
+  transform-origin: bottom center;
+  position: relative;
+  z-index: 2;
+  display: block;
+  text-align: center;
+  line-height: 1;
+  transform: scale(0.5);
+  filter: drop-shadow(0 4px 16px rgba(0,214,143,0.25));
+  user-select: none;
+}
+
+.plant-emoji-large.dead {
+  filter: grayscale(1) brightness(0.55);
+  transform: scale(0.85) rotate(-12deg) !important;
+  transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+.plant-emoji-large.complete {
+  filter: drop-shadow(0 0 24px rgba(0,214,143,0.9));
+  animation: plantCelebrate 0.7s ease;
+}
+
+@keyframes plantCelebrate {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.2); }
+  65%  { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+
+.session-timer {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 52px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -2px;
+  margin-bottom: 4px;
+  transition: color 0.3s;
+}
+
+.session-timer.dead { color: var(--red); }
+.session-timer.complete { color: var(--green); }
+
+.session-label {
+  font-size: 12px;
+  color: var(--text3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.btn-danger {
+  background: rgba(255,107,107,0.1);
+  border: 0.5px solid rgba(255,107,107,0.25);
+  color: var(--red);
+  border-radius: 8px;
+  padding: 11px 24px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: 'Noto Sans JP', sans-serif;
+  transition: background 0.15s;
+  width: 100%;
+}
+
+.btn-danger:active { background: rgba(255,107,107,0.22); }
+
+.btn-green {
+  background: rgba(0,214,143,0.12);
+  border: 0.5px solid rgba(0,214,143,0.3);
+  color: var(--green);
+  border-radius: 8px;
+  padding: 13px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'Noto Sans JP', sans-serif;
+  width: 100%;
+  margin-bottom: 8px;
+  transition: background 0.15s;
+}
+
+.btn-green:active { background: rgba(0,214,143,0.22); }
+
+.leave-banner {
+  background: rgba(255,107,107,0.1);
+  border: 0.5px solid rgba(255,107,107,0.3);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--red);
+  text-align: center;
+  margin-bottom: 12px;
+  display: none;
+}
+
+.leave-banner.show { display: block; animation: fadeIn 0.2s ease; }
+
+/* Forest gallery */
+.forest-stats-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.forest-stat {
+  flex: 1;
+  background: var(--surface2);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 10px;
+  text-align: center;
+}
+
+.forest-stat-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 3px;
+}
+
+.forest-stat-key { font-size: 10px; color: var(--text3); }
+
+.forest-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 7px;
+}
+
+.forest-tree {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 2px 6px;
+  background: var(--surface2);
+  border-radius: 8px;
+  border: 0.5px solid var(--border);
+  animation: fadeIn 0.3s ease;
+}
+
+.forest-tree-emoji { font-size: 22px; }
+.forest-tree-time { font-size: 9px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
+.forest-tree-dur  { font-size: 9px; color: var(--text3); }
+
+/* Focus session active indicator in nav */
+@keyframes leafPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.nav-item.session-live svg {
+  animation: leafPulse 1.5s infinite;
+  color: var(--green);
+}
+
+.nav-item.session-live { color: var(--green); }
+
 </style>
 </head>
 <body>
@@ -837,6 +1093,143 @@ body {
   </div>
 </div>
 
+<!-- PAGE: FOCUS (Forest-style) -->
+<div class="page" id="page-focus">
+
+  <!-- STATE: SETUP -->
+  <div class="focus-state active" id="fs-setup">
+    <div class="focus-setup-header">
+      <div class="header-title" style="text-align:center;font-size:26px;">フォーカスタイム</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:6px;">集中している間、木が育ちます</div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">植物を選ぶ</div>
+      <div class="plant-selector" id="plant-selector">
+        <div class="plant-opt selected" onclick="selectPlant(this,'tree','🌳')">
+          <div class="plant-opt-emoji">🌳</div>
+          <div class="plant-opt-name">木</div>
+        </div>
+        <div class="plant-opt" onclick="selectPlant(this,'flower','🌸')">
+          <div class="plant-opt-emoji">🌸</div>
+          <div class="plant-opt-name">花</div>
+        </div>
+        <div class="plant-opt" onclick="selectPlant(this,'bamboo','🎋')">
+          <div class="plant-opt-emoji">🎋</div>
+          <div class="plant-opt-name">竹</div>
+        </div>
+        <div class="plant-opt" onclick="selectPlant(this,'pine','🌲')">
+          <div class="plant-opt-emoji">🌲</div>
+          <div class="plant-opt-name">松</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">集中時間を選ぶ</div>
+      <div class="duration-grid">
+        <div class="dur-btn" onclick="selectDuration(this,10)">10<span>分</span></div>
+        <div class="dur-btn selected" onclick="selectDuration(this,25)">25<span>分</span></div>
+        <div class="dur-btn" onclick="selectDuration(this,45)">45<span>分</span></div>
+        <div class="dur-btn" onclick="selectDuration(this,60)">60<span>分</span></div>
+      </div>
+      <button class="btn" style="background:linear-gradient(135deg,#1a6b3a,#00d68f);font-size:15px;padding:14px;letter-spacing:0.03em;" onclick="beginFocusSession()">
+        🌱　集中を始める
+      </button>
+    </div>
+
+    <!-- Forest gallery -->
+    <div class="card" id="forest-card">
+      <div class="card-label">私の森</div>
+      <div class="forest-stats-row" id="forest-stats-row" style="display:none;"></div>
+      <div class="forest-grid" id="forest-grid"></div>
+      <div id="forest-empty" style="text-align:center;padding:24px 0 8px;font-size:13px;color:var(--text3);">
+        最初の木を育てましょう 🌱
+      </div>
+    </div>
+  </div>
+
+  <!-- STATE: RUNNING -->
+  <div class="focus-state" id="fs-running">
+    <div style="padding:16px 0 0;">
+      <div class="leave-banner" id="leave-banner"></div>
+    </div>
+    <div class="session-wrap">
+      <div class="plant-stage-container">
+        <svg width="200" height="200" viewBox="0 0 200 200" class="session-ring">
+          <circle cx="100" cy="100" r="88" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="10"/>
+          <circle cx="100" cy="100" r="88" fill="none" stroke="rgba(0,214,143,0.1)" stroke-width="10"/>
+          <circle cx="100" cy="100" r="88" fill="none" stroke="url(#fgrad)" stroke-width="10"
+            stroke-dasharray="553" stroke-dashoffset="553" stroke-linecap="round"
+            transform="rotate(-90 100 100)" id="focus-progress-ring"/>
+          <defs>
+            <linearGradient id="fgrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#1a6b3a"/>
+              <stop offset="100%" stop-color="#00d68f"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="plant-emoji-large" id="focus-plant-emoji">🌱</span>
+      </div>
+
+      <div class="session-timer" id="focus-timer">25:00</div>
+      <div class="session-label" id="focus-label">木が育っています...</div>
+
+      <div style="padding:0 0;width:100%;">
+        <div class="card" style="text-align:center;padding:14px;margin-bottom:12px;">
+          <div style="font-size:13px;color:var(--text2);line-height:1.7;" id="focus-tip">
+            スマホから離れましょう。<br>集中が続くほど木は大きく育ちます。
+          </div>
+        </div>
+        <button class="btn-danger" onclick="confirmAbandon()">セッションを中断する 🥀</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATE: DEAD -->
+  <div class="focus-state" id="fs-dead">
+    <div class="session-wrap">
+      <div class="plant-stage-container">
+        <span class="plant-emoji-large dead" id="dead-plant-emoji">🥀</span>
+      </div>
+      <div class="session-timer dead" style="font-size:26px;margin-bottom:8px;">集中が途切れました</div>
+      <div class="session-label">アプリを離れたため、木が枯れました</div>
+      <div style="padding:0;width:100%;margin-top:8px;">
+        <div class="card" style="text-align:center;padding:18px;margin-bottom:12px;background:rgba(255,107,107,0.05);border-color:rgba(255,107,107,0.15);">
+          <div style="font-size:13px;color:var(--text2);line-height:1.7;" id="dead-msg">次は最後まで集中できますよ。</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:8px;" id="dead-progress-msg"></div>
+        </div>
+        <button class="btn" style="background:linear-gradient(135deg,#1a6b3a,#00d68f);margin-bottom:8px;" onclick="restartFocus()">もう一度試す 🌱</button>
+        <button class="btn-ghost" onclick="exitFocusSession()">セットアップに戻る</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATE: COMPLETE -->
+  <div class="focus-state" id="fs-complete">
+    <div class="session-wrap">
+      <div class="plant-stage-container">
+        <svg width="200" height="200" viewBox="0 0 200 200" class="session-ring">
+          <circle cx="100" cy="100" r="88" fill="none" stroke="rgba(0,214,143,0.2)" stroke-width="10"/>
+        </svg>
+        <span class="plant-emoji-large complete" id="complete-plant-emoji" style="transform:scale(1)!important;">🌳</span>
+      </div>
+      <div class="session-timer complete" style="font-size:32px;margin-bottom:6px;">達成！</div>
+      <div class="session-label" id="complete-label">25分間 集中しました</div>
+      <div style="padding:0;width:100%;margin-top:8px;">
+        <div class="card" style="text-align:center;padding:18px;margin-bottom:12px;background:rgba(0,214,143,0.05);border-color:rgba(0,214,143,0.18);">
+          <div style="font-size:28px;margin-bottom:8px;">🎉</div>
+          <div style="font-size:15px;font-weight:500;color:var(--green);margin-bottom:6px;">木が森に植えられました！</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6;">集中した時間が木として記録されました。<br>森がどんどん育っていきます。</div>
+        </div>
+        <button class="btn-green" onclick="exitFocusSession()">森を見る 🌲</button>
+        <button class="btn-ghost" onclick="restartFocus()">もう一度集中する</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
 <!-- PAGE: CHALLENGE -->
 <div class="page" id="page-challenge">
   <div class="header">
@@ -982,6 +1375,15 @@ body {
         <path d="M7 8h8M7 12h8M7 16h4"/></svg>
     </div>記録
   </button>
+  <button class="nav-item" id="nav-focus" onclick="switchPage('focus',this)">
+    <div class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M11 20v-7"/>
+        <path d="M4 13c0-3.87 3.13-7 7-7s7 3.13 7 7"/>
+        <path d="M7 17c0-2.21 1.79-4 4-4s4 1.79 4 4"/>
+      </svg>
+    </div>フォーカス
+  </button>
   <button class="nav-item" onclick="switchPage('challenge',this)">
     <div class="nav-icon">
       <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -1044,7 +1446,19 @@ body {
   </div>
 </div>
 
+<!-- MODAL: ABANDON CONFIRM -->
+<div class="modal-overlay" id="modal-abandon">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">セッションを中断しますか？</div>
+    <div class="modal-sub">アプリを離れると木が枯れてしまいます。本当に中断しますか？</div>
+    <button class="btn" style="background:rgba(255,107,107,0.85);margin-bottom:8px;" onclick="doAbandon()">中断する 🥀</button>
+    <button class="btn-ghost" onclick="closeModal('modal-abandon')">続ける 🌱</button>
+  </div>
+</div>
+
 <script>
+// ===== HOME PAGE =====
 const days = ['月','火','水','木','金','土','今'];
 const hours = [3.5, 2.8, 4.2, 3.1, 2.6, 3.8, 2.6];
 const maxH = Math.max(...hours);
@@ -1083,10 +1497,15 @@ const days2 = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
 dateEl.textContent = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${days2[now.getDay()]}`;
 
 function switchPage(name, btn) {
+  if (focusTimerInterval && name !== 'focus') {
+    showToast('🌱 フォーカス中です。画面に戻るか中断してください');
+    return;
+  }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   btn.classList.add('active');
+  if (name === 'focus') renderForest();
 }
 
 let selectedTrigger = null;
@@ -1155,7 +1574,7 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
 }
 
 const suggestions = [
@@ -1165,6 +1584,275 @@ const suggestions = [
   '「先延ばし」のトリガーが多いです。今すぐ5分だけ作業を始めてみて。',
 ];
 document.getElementById('ai-suggestion').textContent = suggestions[Math.floor(Math.random() * suggestions.length)];
+
+
+// ===== FOCUS SESSION (Forest-style) =====
+let focusDuration = 25;
+let focusPlantType = 'tree';
+let focusPlantEmoji = '🌳';
+let focusTimerInterval = null;
+let focusSecondsLeft = 0;
+let focusTotalSeconds = 0;
+let leaveTimestamp = null;
+let leaveGraceTimer = null;
+
+const LEAVE_KILL_THRESHOLD = 10000; // 10 seconds away = tree dies
+
+const plantStages = {
+  tree:   ['🌱','🌱','🌿','🌿','🌳'],
+  flower: ['🌱','🌱','🌼','🌼','🌸'],
+  bamboo: ['🌱','🌱','🎍','🎍','🎋'],
+  pine:   ['🌱','🌱','🌿','🌿','🌲'],
+};
+
+const focusTips = [
+  'スマホから離れて、今この瞬間だけに集中しましょう。',
+  '集中が深まるほど、木は大きく育ちます。',
+  '一つのことに集中する時間が、最高の生産性を生みます。',
+  '木が育つのを楽しみに、スマホを置いてみましょう。',
+  '集中した時間は、あなたの財産になります。',
+];
+
+function selectPlant(el, type, emoji) {
+  document.querySelectorAll('.plant-opt').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  focusPlantType = type;
+  focusPlantEmoji = emoji;
+}
+
+function selectDuration(el, mins) {
+  document.querySelectorAll('.dur-btn').forEach(d => d.classList.remove('selected'));
+  el.classList.add('selected');
+  focusDuration = mins;
+}
+
+function showFocusState(state) {
+  document.querySelectorAll('.focus-state').forEach(s => s.classList.remove('active'));
+  document.getElementById('fs-' + state).classList.add('active');
+}
+
+function beginFocusSession() {
+  focusSecondsLeft = focusDuration * 60;
+  focusTotalSeconds = focusSecondsLeft;
+  leaveTimestamp = null;
+
+  const plantEl = document.getElementById('focus-plant-emoji');
+  plantEl.textContent = '🌱';
+  plantEl.className = 'plant-emoji-large';
+  plantEl.style.transform = 'scale(0.5)';
+
+  document.getElementById('focus-progress-ring').style.strokeDashoffset = '553';
+  document.getElementById('focus-timer').className = 'session-timer';
+  document.getElementById('focus-label').textContent = '木が育っています...';
+  document.getElementById('leave-banner').classList.remove('show');
+  document.getElementById('focus-tip').textContent = focusTips[Math.floor(Math.random() * focusTips.length)];
+
+  showFocusState('running');
+  updateFocusDisplay();
+
+  focusTimerInterval = setInterval(focusTick, 1000);
+
+  document.addEventListener('visibilitychange', onFocusVisibilityChange);
+  window.addEventListener('pagehide', onFocusPageHide);
+}
+
+function focusTick() {
+  focusSecondsLeft = Math.max(0, focusSecondsLeft - 1);
+  if (focusSecondsLeft === 0) {
+    completeFocusSession();
+  } else {
+    updateFocusDisplay();
+  }
+}
+
+function updateFocusDisplay() {
+  const mins = Math.floor(focusSecondsLeft / 60);
+  const secs = focusSecondsLeft % 60;
+  document.getElementById('focus-timer').textContent =
+    String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+
+  const progress = 1 - (focusSecondsLeft / focusTotalSeconds);
+  document.getElementById('focus-progress-ring').style.strokeDashoffset =
+    String(553 * (1 - progress));
+
+  const stages = plantStages[focusPlantType] || plantStages.tree;
+  const stageIndex = Math.min(4, Math.floor(progress * 5));
+  const plantEl = document.getElementById('focus-plant-emoji');
+  plantEl.textContent = stages[stageIndex];
+
+  const scale = 0.5 + progress * 0.5;
+  plantEl.style.transform = `scale(${scale})`;
+}
+
+function onFocusVisibilityChange() {
+  if (!focusTimerInterval) return;
+
+  if (document.hidden) {
+    leaveTimestamp = Date.now();
+  } else {
+    if (leaveTimestamp !== null) {
+      const away = Date.now() - leaveTimestamp;
+      leaveTimestamp = null;
+      if (away > LEAVE_KILL_THRESHOLD) {
+        killFocusSession();
+      } else {
+        const banner = document.getElementById('leave-banner');
+        banner.textContent = `⚠️ ${Math.round(away / 1000)}秒離れていました。木はまだ生きています！`;
+        banner.classList.add('show');
+        setTimeout(() => banner.classList.remove('show'), 3500);
+      }
+    }
+  }
+}
+
+function onFocusPageHide() {
+  leaveTimestamp = Date.now();
+}
+
+function killFocusSession() {
+  if (!focusTimerInterval) return;
+  clearInterval(focusTimerInterval);
+  focusTimerInterval = null;
+  removeFocusListeners();
+  updateNavFocusState(false);
+
+  const elapsed = focusTotalSeconds - focusSecondsLeft;
+  const progressPct = Math.round((elapsed / focusTotalSeconds) * 100);
+  const elapsedMins = Math.floor(elapsed / 60);
+
+  const stages = plantStages[focusPlantType] || plantStages.tree;
+  const stageIndex = Math.min(4, Math.floor((elapsed / focusTotalSeconds) * 5));
+  document.getElementById('dead-plant-emoji').textContent = progressPct < 5 ? '🥀' : stages[stageIndex];
+
+  document.getElementById('dead-msg').textContent =
+    progressPct >= 80 ? 'あと少しでした！次はきっと完走できます。' :
+    progressPct >= 50 ? `半分以上（${elapsedMins}分）集中できました。素晴らしい！` :
+    elapsedMins >= 1 ? `${elapsedMins}分まで集中できました。次はもっといける！` :
+    '次は最後まで集中できますよ。諦めないで！';
+
+  document.getElementById('dead-progress-msg').textContent =
+    progressPct > 0 ? `達成率 ${progressPct}%` : '';
+
+  showFocusState('dead');
+}
+
+function completeFocusSession() {
+  clearInterval(focusTimerInterval);
+  focusTimerInterval = null;
+  removeFocusListeners();
+  updateNavFocusState(false);
+
+  const stages = plantStages[focusPlantType] || plantStages.tree;
+  const finalEmoji = stages[4];
+
+  document.getElementById('complete-plant-emoji').textContent = finalEmoji;
+  document.getElementById('complete-label').textContent = `${focusDuration}分間 集中しました`;
+
+  const forest = JSON.parse(localStorage.getItem('mindful_forest') || '[]');
+  forest.push({
+    plant: focusPlantType,
+    emoji: finalEmoji,
+    duration: focusDuration,
+    date: new Date().toISOString(),
+  });
+  localStorage.setItem('mindful_forest', JSON.stringify(forest));
+
+  showFocusState('complete');
+  showToast('🌳 木が森に植えられました！');
+}
+
+function confirmAbandon() {
+  document.getElementById('modal-abandon').classList.add('open');
+}
+
+function doAbandon() {
+  closeModal('modal-abandon');
+  killFocusSession();
+}
+
+function restartFocus() {
+  showFocusState('setup');
+  renderForest();
+}
+
+function exitFocusSession() {
+  if (focusTimerInterval) {
+    clearInterval(focusTimerInterval);
+    focusTimerInterval = null;
+    removeFocusListeners();
+    updateNavFocusState(false);
+  }
+  showFocusState('setup');
+  renderForest();
+}
+
+function removeFocusListeners() {
+  document.removeEventListener('visibilitychange', onFocusVisibilityChange);
+  window.removeEventListener('pagehide', onFocusPageHide);
+  clearTimeout(leaveGraceTimer);
+}
+
+function updateNavFocusState(active) {
+  const navFocus = document.getElementById('nav-focus');
+  if (active) navFocus.classList.add('session-live');
+  else navFocus.classList.remove('session-live');
+}
+
+function renderForest() {
+  const forest = JSON.parse(localStorage.getItem('mindful_forest') || '[]');
+  const grid = document.getElementById('forest-grid');
+  const empty = document.getElementById('forest-empty');
+  const statsRow = document.getElementById('forest-stats-row');
+
+  grid.innerHTML = '';
+
+  if (forest.length === 0) {
+    empty.style.display = 'block';
+    statsRow.style.display = 'none';
+    return;
+  }
+
+  empty.style.display = 'none';
+  statsRow.style.display = 'flex';
+
+  const totalMins = forest.reduce((s, t) => s + t.duration, 0);
+  const totalHours = totalMins >= 60
+    ? (totalMins / 60).toFixed(1) + 'h'
+    : totalMins + 'm';
+
+  statsRow.innerHTML = `
+    <div class="forest-stat">
+      <div class="forest-stat-val" style="color:var(--green)">${forest.length}</div>
+      <div class="forest-stat-key">木の本数</div>
+    </div>
+    <div class="forest-stat">
+      <div class="forest-stat-val" style="color:var(--accent)">${totalHours}</div>
+      <div class="forest-stat-key">合計集中</div>
+    </div>
+    <div class="forest-stat">
+      <div class="forest-stat-val" style="color:var(--amber)">${forest.filter(t => {
+        const d = new Date(t.date);
+        const today = new Date();
+        return d.toDateString() === today.toDateString();
+      }).length}</div>
+      <div class="forest-stat-key">今日の木</div>
+    </div>
+  `;
+
+  const recent = [...forest].reverse().slice(0, 20);
+  recent.forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'forest-tree';
+    const d = new Date(t.date);
+    const label = `${d.getMonth() + 1}/${d.getDate()}`;
+    el.innerHTML = `
+      <div class="forest-tree-emoji">${t.emoji}</div>
+      <div class="forest-tree-time">${label}</div>
+      <div class="forest-tree-dur">${t.duration}分</div>
+    `;
+    grid.appendChild(el);
+  });
+}
 </script>
 </body>
 </html>
