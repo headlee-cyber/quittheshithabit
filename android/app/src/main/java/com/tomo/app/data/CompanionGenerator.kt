@@ -1,7 +1,6 @@
 package com.tomo.app.data
 
-import com.tomo.app.data.model.CompanionProfile
-import com.tomo.app.data.model.UserProfile
+import com.tomo.app.data.model.*
 
 object CompanionGenerator {
 
@@ -41,19 +40,20 @@ object CompanionGenerator {
     )
 
     private val firstMessage = mapOf(
-        "work"     to "はじめまして。仕事のことで頭がいっぱいになること、私にもよくあります。今日、どんな気持ちでここに来ましたか？",
-        "relation" to "はじめまして。人間関係の疲れ、わかります。誰かのことを考えすぎて、自分が消えそうになる感覚。今日は少し、話しましょう。",
-        "future"   to "はじめまして。将来のことって、考えれば考えるほど霧の中に入っていく感じがしませんか。私も同じです。",
-        "lonely"   to "はじめまして。孤独って、不思議ですよね。人の中にいても感じることがある。今日、あなたがここに来てくれて嬉しいです。",
+        "work"     to "なんか、はじめましてって感じしないね。仕事のこと、私もよくある。よろしく。",
+        "relation" to "なんか、はじめましてって感じしないね。人間関係って難しいよな、って私も思ってる。よろしく。",
+        "future"   to "なんか、はじめましてって感じしないね。将来のこと考えすぎて動けなくなる感じ、わかるよ。よろしく。",
+        "lonely"   to "なんか、はじめましてって感じしないね。ひとりで抱えてることって、言葉にしにくいよな。よろしく。",
     )
 
     fun generate(user: UserProfile): CompanionProfile {
-        val pool = names[user.gender]?.get(user.age)
-            ?: names["other"]!!["twenties"]!!
+        val pool = names[user.gender]?.get(user.age) ?: names["other"]!!["twenties"]!!
         val name = pool.random()
+        val archetype = archetypeFrom(user.mbti)
 
         return CompanionProfile(
             name         = name,
+            archetype    = archetype,
             escapeDesc   = escapeDesc[user.escape] ?: "",
             aspireDesc   = aspireDesc[user.aspire] ?: "",
             firstMessage = firstMessage[user.escape] ?: firstMessage["lonely"]!!,
