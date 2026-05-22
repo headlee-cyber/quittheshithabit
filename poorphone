@@ -3,30 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="theme-color" content="#0c0c10">
+<meta name="theme-color" content="#09090f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Mindful — スマホ依存を断つ</title>
+<title>Tomo — あなたの伴走者</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0c0c10;
-  --surface: #131318;
-  --surface2: #1a1a22;
+  --bg: #09090f;
+  --surface: #111118;
+  --surface2: #18181f;
   --border: rgba(255,255,255,0.06);
-  --border2: rgba(255,255,255,0.12);
-  --text: #f0eff5;
-  --text2: rgba(240,239,245,0.55);
-  --text3: rgba(240,239,245,0.3);
+  --border2: rgba(255,255,255,0.11);
+  --text: #eeedf5;
+  --text2: rgba(238,237,245,0.55);
+  --text3: rgba(238,237,245,0.28);
   --accent: #8b7cf8;
   --accent2: #6c5ce7;
   --green: #00d68f;
-  --amber: #ffb347;
   --red: #ff6b6b;
-  --pink: #f8a4c0;
-  --r: 14px;
-  --r-sm: 8px;
+  --r: 16px;
+  --r-sm: 10px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -36,21 +34,329 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  overflow-x: hidden;
   max-width: 430px;
   margin: 0 auto;
+  overflow-x: hidden;
   position: relative;
-  padding-bottom: 80px;
 }
+
+/* ── COMPANION SVG ── */
+.companion-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.companion-figure {
+  transition: opacity 1.2s ease, filter 1.2s ease;
+  overflow: visible;
+}
+
+.companion-figure.s0 { opacity: 0.08; filter: grayscale(1) blur(1px); }
+.companion-figure.s1 { opacity: 0.22; filter: grayscale(0.7) drop-shadow(0 0 6px rgba(108,92,231,0.2)); }
+.companion-figure.s2 { opacity: 0.40; filter: grayscale(0.4) drop-shadow(0 0 10px rgba(108,92,231,0.3)); }
+.companion-figure.s3 { opacity: 0.58; filter: grayscale(0.15) drop-shadow(0 0 14px rgba(108,92,231,0.45)); }
+.companion-figure.s4 { opacity: 0.76; filter: drop-shadow(0 0 18px rgba(108,92,231,0.55)); }
+.companion-figure.s5 { opacity: 0.90; filter: drop-shadow(0 0 22px rgba(108,92,231,0.65)); }
+.companion-figure.born {
+  opacity: 1;
+  filter: drop-shadow(0 0 28px rgba(139,124,248,0.8));
+  animation: companionGlow 3s ease-in-out infinite;
+}
+.companion-figure.focus-alive {
+  opacity: 1;
+  filter: drop-shadow(0 0 32px rgba(0,214,143,0.7));
+  animation: companionGlowGreen 2.5s ease-in-out infinite;
+}
+.companion-figure.focus-dead {
+  opacity: 0.35;
+  filter: grayscale(1) blur(0.5px);
+  transition: all 0.8s ease;
+}
+
+@keyframes companionGlow {
+  0%,100% { filter: drop-shadow(0 0 22px rgba(139,124,248,0.7)); }
+  50%      { filter: drop-shadow(0 0 36px rgba(139,124,248,1)); }
+}
+@keyframes companionGlowGreen {
+  0%,100% { filter: drop-shadow(0 0 24px rgba(0,214,143,0.6)); }
+  50%      { filter: drop-shadow(0 0 42px rgba(0,214,143,0.95)); }
+}
+@keyframes torsoBreath {
+  0%,100% { transform: scaleY(1); }
+  50%      { transform: scaleY(1.018); }
+}
+.comp-torso { transform-origin: 50px 140px; animation: torsoBreath 4s ease-in-out infinite; }
+
+/* ── ONBOARDING ── */
+#onboard {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.ob-screen {
+  display: none;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 0 24px 40px;
+  animation: fadeUp 0.35s ease;
+}
+.ob-screen.active { display: flex; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ob-progress {
+  display: flex;
+  gap: 5px;
+  padding: 56px 0 0;
+  margin-bottom: 28px;
+}
+.ob-prog-dot {
+  height: 3px;
+  flex: 1;
+  border-radius: 2px;
+  background: var(--border2);
+  transition: background 0.4s ease;
+}
+.ob-prog-dot.done { background: var(--accent); }
+.ob-prog-dot.active { background: rgba(139,124,248,0.5); }
+
+.ob-companion-area {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+
+.ob-bubble {
+  background: var(--surface);
+  border: 0.5px solid var(--border2);
+  border-radius: 18px 18px 18px 4px;
+  padding: 16px 20px;
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text);
+  margin-bottom: 28px;
+  position: relative;
+}
+
+.ob-bubble-name {
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+}
+
+.ob-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.ob-opt {
+  background: var(--surface);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--r);
+  padding: 16px 20px;
+  font-size: 14px;
+  color: var(--text2);
+  cursor: pointer;
+  text-align: left;
+  font-family: 'Noto Sans JP', sans-serif;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ob-opt:active { transform: scale(0.98); }
+.ob-opt.selected {
+  border-color: var(--accent);
+  background: rgba(139,124,248,0.1);
+  color: var(--text);
+}
+.ob-opt-icon { font-size: 20px; flex-shrink: 0; }
+
+.ob-input-wrap {
+  background: var(--surface);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--r);
+  padding: 4px 4px 4px 18px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  transition: border-color 0.2s;
+}
+.ob-input-wrap:focus-within { border-color: var(--accent); }
+.ob-input-wrap input {
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 16px;
+  font-family: 'Noto Sans JP', sans-serif;
+  flex: 1;
+  padding: 14px 0;
+}
+.ob-input-wrap input::placeholder { color: var(--text3); }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+  color: #fff;
+  border: none;
+  border-radius: var(--r);
+  padding: 16px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'Noto Sans JP', sans-serif;
+  width: 100%;
+  transition: opacity 0.15s;
+  letter-spacing: 0.02em;
+}
+.btn-primary:active { opacity: 0.85; }
+.btn-primary:disabled { opacity: 0.35; cursor: default; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text3);
+  border: none;
+  padding: 12px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: 'Noto Sans JP', sans-serif;
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* welcome screen */
+.welcome-hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 0 40px;
+}
+
+.welcome-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 42px;
+  color: var(--text);
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
+}
+
+.welcome-sub {
+  font-size: 13px;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+  margin-bottom: 48px;
+}
+
+.welcome-desc {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.85;
+  max-width: 300px;
+  margin-bottom: 48px;
+}
+
+/* generating screen */
+.gen-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 0;
+}
+.gen-label {
+  font-size: 13px;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+  margin-top: 28px;
+}
+.gen-dots {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 12px;
+}
+.gen-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: genDot 1.4s ease-in-out infinite;
+}
+.gen-dot:nth-child(2) { animation-delay: 0.2s; }
+.gen-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes genDot {
+  0%,80%,100% { opacity: 0.2; transform: scale(0.8); }
+  40%          { opacity: 1;   transform: scale(1.2); }
+}
+
+/* meeting screen */
+.meet-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 0 0;
+}
+.meet-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 32px;
+  color: var(--text);
+  margin-top: 20px;
+  margin-bottom: 4px;
+}
+.meet-tag {
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  margin-bottom: 28px;
+}
+.meet-profile {
+  background: var(--surface);
+  border: 0.5px solid var(--border2);
+  border-radius: var(--r);
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+.meet-profile-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 8px 0;
+  border-bottom: 0.5px solid var(--border);
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+.meet-profile-row:last-child { border-bottom: none; }
+.meet-profile-icon { flex-shrink: 0; font-size: 15px; margin-top: 1px; }
+
+/* ── APP SCREENS ── */
+#app { display: none; }
+
+.page { display: none; padding: 0 20px 100px; animation: fadeUp 0.25s ease; }
+.page.active { display: block; }
 
 /* NAV */
 .nav {
   position: fixed;
   bottom: 0; left: 50%;
   transform: translateX(-50%);
-  width: 100%;
-  max-width: 430px;
-  background: rgba(13,13,18,0.92);
+  width: 100%; max-width: 430px;
+  background: rgba(9,9,15,0.93);
   backdrop-filter: blur(20px);
   border-top: 0.5px solid var(--border2);
   display: flex;
@@ -58,7 +364,6 @@ body {
   padding: 0 8px;
   padding-bottom: env(safe-area-inset-bottom);
 }
-
 .nav-item {
   flex: 1;
   display: flex;
@@ -74,100 +379,71 @@ body {
   font-size: 10px;
   transition: color 0.2s;
 }
-
 .nav-item.active { color: var(--accent); }
+.nav-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
 
-.nav-icon {
-  width: 24px; height: 24px;
-  display: flex; align-items: center; justify-content: center;
-}
-
-/* PAGES */
-.page { display: none; padding: 0 16px; animation: fadeIn 0.2s ease; }
-.page.active { display: block; }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
-/* HEADER */
-.header {
-  padding: 56px 0 8px;
+/* HOME */
+.home-header {
+  padding: 56px 0 20px;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
 }
+.home-greeting { font-size: 13px; color: var(--text3); margin-bottom: 3px; }
+.home-name { font-family: 'DM Serif Display', serif; font-size: 26px; }
 
-.header-title {
-  font-family: 'DM Serif Display', serif;
-  font-size: 28px;
-  color: var(--text);
-  line-height: 1.1;
-}
-
-.header-date {
-  font-size: 12px;
-  color: var(--text3);
-  font-family: 'JetBrains Mono', monospace;
-  padding-bottom: 4px;
-}
-
-/* HERO RING */
-.ring-container {
+.home-companion-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 28px 0 24px;
-}
-
-.ring-wrap {
+  padding: 8px 0 28px;
   position: relative;
-  width: 180px; height: 180px;
 }
 
-.ring-wrap svg { position: absolute; top: 0; left: 0; }
-
-.ring-center {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-}
-
-.ring-time {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 32px;
-  font-weight: 500;
-  color: var(--text);
-  letter-spacing: -1px;
-}
-
-.ring-label {
-  font-size: 10px;
+.companion-status {
+  font-size: 11px;
   color: var(--text3);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 14px;
+  margin-bottom: 4px;
+}
+.companion-name-home {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  color: var(--text);
+  margin-bottom: 16px;
 }
 
-.ring-goal {
-  margin-top: 12px;
-  font-size: 13px;
-  color: var(--text2);
+.home-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+  width: 100%;
 }
+.stat-box {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 14px 8px;
+  text-align: center;
+}
+.stat-box-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.stat-box-key { font-size: 10px; color: var(--text3); }
 
-.ring-goal span { color: var(--green); font-weight: 500; }
-
-/* CARDS */
 .card {
   background: var(--surface);
   border: 0.5px solid var(--border);
   border-radius: var(--r);
-  padding: 16px;
+  padding: 18px;
   margin-bottom: 12px;
-  position: relative;
-  overflow: hidden;
 }
-
 .card-label {
   font-size: 10px;
   color: var(--text3);
@@ -176,237 +452,253 @@ body {
   margin-bottom: 10px;
 }
 
-.card-title {
-  font-size: 15px;
-  font-weight: 500;
-  margin-bottom: 4px;
+/* FOCUS */
+.focus-setup-header {
+  padding: 56px 0 20px;
+  text-align: center;
 }
 
-.card-sub {
-  font-size: 13px;
-  color: var(--text2);
-  line-height: 1.6;
-}
-
-/* TRIGGER BUTTONS */
-.trigger-grid {
+.duration-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
-  margin: 10px 0;
+  margin-bottom: 16px;
 }
-
-.trigger-btn {
+.dur-btn {
   background: var(--surface2);
-  border: 0.5px solid var(--border);
+  border: 1.5px solid var(--border);
   border-radius: var(--r-sm);
-  padding: 10px 6px;
+  padding: 14px 4px 10px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.15s;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
-  font-family: 'Noto Sans JP', sans-serif;
+  gap: 3px;
+  transition: all 0.15s;
 }
+.dur-btn span { font-size: 10px; color: inherit; opacity: 0.6; font-family: 'Noto Sans JP', sans-serif; font-weight: 400; }
+.dur-btn:active { transform: scale(0.96); }
+.dur-btn.selected { border-color: var(--accent); background: rgba(139,124,248,0.1); color: var(--accent); }
 
-.trigger-btn:active { transform: scale(0.95); }
+.focus-state { display: none; }
+.focus-state.active { display: block; }
 
-.trigger-btn.selected {
-  background: rgba(139,124,248,0.15);
-  border-color: rgba(139,124,248,0.4);
-}
-
-.trigger-emoji { font-size: 20px; }
-.trigger-label { font-size: 10px; color: var(--text2); }
-
-/* STREAK */
-.streak-row {
+.session-wrap {
   display: flex;
-  gap: 6px;
+  flex-direction: column;
   align-items: center;
-  flex-wrap: wrap;
+  padding: 24px 0 16px;
 }
 
-.streak-day {
-  width: 32px; height: 32px;
-  border-radius: 50%;
+.session-ring-wrap {
+  position: relative;
+  width: 220px;
+  height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  margin-bottom: 24px;
+}
+
+.session-ring-svg {
+  position: absolute;
+  top: 0; left: 0;
+  pointer-events: none;
+}
+
+.session-timer {
   font-family: 'JetBrains Mono', monospace;
-  background: var(--surface2);
-  border: 0.5px solid var(--border);
-  color: var(--text3);
-}
-
-.streak-day.done {
-  background: rgba(0,214,143,0.15);
-  border-color: rgba(0,214,143,0.35);
-  color: var(--green);
-}
-
-.streak-day.today {
-  background: rgba(139,124,248,0.2);
-  border-color: rgba(139,124,248,0.5);
-  color: var(--accent);
+  font-size: 48px;
   font-weight: 500;
-}
-
-/* STATS ROW */
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.stat-card {
-  background: var(--surface);
-  border: 0.5px solid var(--border);
-  border-radius: var(--r);
-  padding: 14px 12px;
-  text-align: center;
-}
-
-.stat-val {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 20px;
-  font-weight: 500;
+  letter-spacing: -2px;
   margin-bottom: 4px;
+  transition: color 0.3s;
 }
+.session-timer.dead { color: var(--red); }
+.session-timer.complete { color: var(--green); }
 
-.stat-key { font-size: 10px; color: var(--text3); }
-
-/* LOG ITEM */
-.log-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 0.5px solid var(--border);
-}
-
-.log-item:last-child { border-bottom: none; }
-
-.log-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.log-time {
-  font-family: 'JetBrains Mono', monospace;
+.session-label {
   font-size: 11px;
   color: var(--text3);
-  min-width: 40px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
 }
 
-.log-text { font-size: 13px; color: var(--text2); flex: 1; }
-.log-trigger {
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 20px;
-  background: var(--surface2);
-  color: var(--text2);
-  white-space: nowrap;
-}
-
-/* CHALLENGE */
-.mission-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 0.5px solid var(--border);
-  cursor: pointer;
-}
-
-.mission-item:last-child { border-bottom: none; }
-
-.mission-check {
-  width: 22px; height: 22px;
-  border-radius: 50%;
-  border: 1.5px solid var(--border2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-top: 1px;
-  transition: all 0.2s;
-}
-
-.mission-check.done {
-  background: var(--green);
-  border-color: var(--green);
-}
-
-.mission-body { flex: 1; }
-.mission-title { font-size: 14px; margin-bottom: 3px; }
-.mission-title.done { text-decoration: line-through; color: var(--text3); }
-.mission-desc { font-size: 12px; color: var(--text3); }
-
-/* AI CARD */
-.ai-card {
-  background: linear-gradient(135deg, rgba(108,92,231,0.15) 0%, rgba(139,124,248,0.08) 100%);
-  border: 0.5px solid rgba(139,124,248,0.25);
-  border-radius: var(--r);
-  padding: 18px;
+.leave-banner {
+  background: rgba(255,107,107,0.1);
+  border: 0.5px solid rgba(255,107,107,0.3);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--red);
+  text-align: center;
   margin-bottom: 12px;
+  display: none;
 }
+.leave-banner.show { display: block; animation: fadeUp 0.2s ease; }
 
-.ai-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.ai-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 8px var(--accent);
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-
-.ai-name { font-size: 11px; color: var(--accent); letter-spacing: 0.1em; }
-
-.ai-text {
-  font-size: 14px;
-  color: var(--text);
-  line-height: 1.7;
-  margin-bottom: 14px;
-}
-
-.ai-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.ai-action {
-  background: rgba(139,124,248,0.15);
-  border: 0.5px solid rgba(139,124,248,0.3);
-  border-radius: 6px;
-  padding: 7px 12px;
-  font-size: 12px;
-  color: var(--accent);
+.btn-danger {
+  background: rgba(255,107,107,0.08);
+  border: 0.5px solid rgba(255,107,107,0.22);
+  color: var(--red);
+  border-radius: var(--r-sm);
+  padding: 12px;
+  font-size: 13px;
   cursor: pointer;
   font-family: 'Noto Sans JP', sans-serif;
+  width: 100%;
   transition: background 0.15s;
 }
+.btn-danger:active { background: rgba(255,107,107,0.18); }
 
-.ai-action:active { background: rgba(139,124,248,0.3); }
+.btn-green {
+  background: rgba(0,214,143,0.1);
+  border: 0.5px solid rgba(0,214,143,0.28);
+  color: var(--green);
+  border-radius: var(--r-sm);
+  padding: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'Noto Sans JP', sans-serif;
+  width: 100%;
+  margin-bottom: 8px;
+  transition: background 0.15s;
+}
+.btn-green:active { background: rgba(0,214,143,0.2); }
 
-/* MODAL */
+/* CHAT */
+.chat-header {
+  padding: 56px 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.chat-companion-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  box-shadow: 0 0 16px rgba(139,124,248,0.4);
+}
+.chat-companion-info { flex: 1; }
+.chat-companion-name-small { font-size: 15px; font-weight: 500; margin-bottom: 2px; }
+.chat-companion-status { font-size: 11px; color: var(--accent); }
+
+.chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 20px;
+  min-height: 200px;
+}
+
+.chat-msg {
+  display: flex;
+  gap: 10px;
+  animation: fadeUp 0.3s ease;
+}
+
+.chat-msg.user { flex-direction: row-reverse; }
+
+.chat-msg-bubble {
+  max-width: 75%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.chat-msg.companion .chat-msg-bubble {
+  background: var(--surface);
+  border: 0.5px solid var(--border2);
+  border-bottom-left-radius: 4px;
+  color: var(--text);
+}
+
+.chat-msg.user .chat-msg-bubble {
+  background: rgba(139,124,248,0.18);
+  border: 0.5px solid rgba(139,124,248,0.3);
+  border-bottom-right-radius: 4px;
+  color: var(--text);
+}
+
+.chat-msg-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+  flex-shrink: 0;
+  align-self: flex-end;
+  box-shadow: 0 0 10px rgba(139,124,248,0.3);
+}
+
+.chat-reply-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.chat-reply-opt {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 11px 18px;
+  font-size: 13px;
+  color: var(--text2);
+  cursor: pointer;
+  text-align: left;
+  font-family: 'Noto Sans JP', sans-serif;
+  transition: all 0.15s;
+}
+.chat-reply-opt:active { background: rgba(139,124,248,0.12); border-color: var(--accent); color: var(--text); }
+
+.chat-free-input {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: var(--surface);
+  border: 0.5px solid var(--border2);
+  border-radius: 24px;
+  padding: 4px 4px 4px 18px;
+  margin-bottom: 12px;
+}
+.chat-free-input input {
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 14px;
+  font-family: 'Noto Sans JP', sans-serif;
+  flex: 1;
+  padding: 10px 0;
+}
+.chat-free-input input::placeholder { color: var(--text3); }
+.chat-send-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+.chat-send-btn:active { opacity: 0.75; }
+
+/* MODAL ABANDON */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -417,9 +709,7 @@ body {
   align-items: flex-end;
   justify-content: center;
 }
-
 .modal-overlay.open { display: flex; }
-
 .modal {
   background: var(--surface);
   border-top: 0.5px solid var(--border2);
@@ -429,742 +719,958 @@ body {
   max-width: 430px;
   animation: slideUp 0.25s ease;
 }
-
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 20px; }
+.modal-title { font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 8px; }
+.modal-sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; line-height: 1.65; }
 
-.modal-handle {
-  width: 36px; height: 4px;
-  background: var(--border2);
-  border-radius: 2px;
-  margin: 0 auto 20px;
-}
-
-.modal-title {
-  font-family: 'DM Serif Display', serif;
-  font-size: 22px;
-  margin-bottom: 6px;
-}
-
-.modal-sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; line-height: 1.6; }
-
-/* INPUT */
-.input-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--surface2);
-  border: 0.5px solid var(--border2);
-  border-radius: var(--r-sm);
-  padding: 4px 4px 4px 14px;
-  margin-bottom: 12px;
-}
-
-.input-row input {
-  background: none;
-  border: none;
-  outline: none;
-  color: var(--text);
-  font-size: 14px;
-  font-family: 'Noto Sans JP', sans-serif;
-  flex: 1;
-  padding: 8px 0;
-}
-
-.input-row input::placeholder { color: var(--text3); }
-
-.btn {
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: 'Noto Sans JP', sans-serif;
-  width: 100%;
-  transition: background 0.15s;
-}
-
-.btn:active { background: var(--accent2); }
-
-.btn-ghost {
-  background: transparent;
-  color: var(--text2);
-  border: 0.5px solid var(--border2);
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-size: 14px;
-  cursor: pointer;
-  font-family: 'Noto Sans JP', sans-serif;
-  width: 100%;
-  margin-top: 8px;
-}
-
-/* PREMIUM BANNER */
-.premium-banner {
-  background: linear-gradient(135deg, #1a1530, #231d3d);
-  border: 0.5px solid rgba(139,124,248,0.2);
-  border-radius: var(--r);
-  padding: 18px;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.premium-icon {
-  font-size: 28px;
-  flex-shrink: 0;
-}
-
-.premium-text h4 { font-size: 14px; margin-bottom: 3px; }
-.premium-text p { font-size: 12px; color: var(--text2); line-height: 1.5; }
-
-.badge-premium {
-  background: rgba(139,124,248,0.2);
-  color: var(--accent);
-  font-size: 10px;
-  padding: 3px 8px;
-  border-radius: 4px;
-  white-space: nowrap;
-  margin-left: auto;
-  flex-shrink: 0;
-}
-
-/* PROFILE */
-.profile-avatar {
-  width: 72px; height: 72px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent2), var(--pink));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  margin-bottom: 12px;
-}
-
-.section-sep {
-  height: 0.5px;
-  background: var(--border);
-  margin: 16px 0;
-}
-
-.setting-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 13px 0;
-  border-bottom: 0.5px solid var(--border);
-  cursor: pointer;
-}
-
-.setting-row:last-child { border-bottom: none; }
-.setting-label { font-size: 14px; }
-.setting-val { font-size: 13px; color: var(--text3); }
-
-.toggle {
-  width: 44px; height: 26px;
-  background: var(--surface2);
-  border-radius: 13px;
-  border: 0.5px solid var(--border2);
-  position: relative;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.toggle.on { background: var(--accent); border-color: var(--accent); }
-
-.toggle-knob {
-  position: absolute;
-  top: 2px; left: 2px;
-  width: 20px; height: 20px;
-  background: #fff;
-  border-radius: 50%;
-  transition: transform 0.2s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
-}
-
-.toggle.on .toggle-knob { transform: translateX(18px); }
-
-/* NOTIFICATION TOAST */
+/* TOAST */
 .toast {
   position: fixed;
-  top: 60px; left: 50%;
-  transform: translateX(-50%) translateY(-20px);
+  top: 56px; left: 50%;
+  transform: translateX(-50%) translateY(-16px);
   background: var(--surface);
   border: 0.5px solid var(--border2);
   border-radius: 30px;
   padding: 10px 20px;
   font-size: 13px;
-  color: var(--text);
   z-index: 300;
   opacity: 0;
   transition: all 0.3s;
   pointer-events: none;
   white-space: nowrap;
 }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-.toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
+/* spark animation on companion birth */
+@keyframes sparkBurst {
+  0%   { opacity: 1; transform: scale(0) translate(0,0); }
+  100% { opacity: 0; transform: scale(1) translate(var(--tx), var(--ty)); }
 }
-
-/* CHART MINI */
-.chart-row {
-  display: flex;
-  align-items: flex-end;
-  gap: 6px;
-  height: 60px;
-  margin: 8px 0;
+.spark {
+  position: absolute;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: sparkBurst 0.8s ease-out forwards;
 }
-
-.bar-wrap {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  height: 100%;
-  justify-content: flex-end;
-}
-
-.bar {
-  width: 100%;
-  border-radius: 4px 4px 0 0;
-  background: rgba(139,124,248,0.25);
-  transition: height 0.3s ease;
-}
-
-.bar.today { background: rgba(139,124,248,0.7); }
-.bar.good { background: rgba(0,214,143,0.4); }
-
-.bar-day { font-size: 10px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
-
-/* PROGRESS BAR */
-.progress-track {
-  height: 6px;
-  background: var(--surface2);
-  border-radius: 3px;
-  overflow: hidden;
-  margin: 8px 0 4px;
-}
-
-.progress-fill {
-  height: 100%;
-  border-radius: 3px;
-  background: linear-gradient(90deg, var(--accent2), var(--accent));
-  transition: width 0.5s ease;
-}
-
 </style>
 </head>
 <body>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- PAGE: HOME -->
-<div class="page active" id="page-home">
-  <div class="header">
-    <div>
-      <div class="header-date" id="today-date">2025.06.14 SAT</div>
-      <div class="header-title">おはよう、<br>今日も頑張ろう</div>
+<!-- ══════════════════════════════
+     ONBOARDING
+══════════════════════════════ -->
+<div id="onboard">
+
+  <!-- WELCOME -->
+  <div class="ob-screen active" id="ob-welcome" style="padding:0 24px 40px;">
+    <div class="welcome-hero">
+      <div class="companion-wrap" style="margin-bottom:36px;">
+        <svg class="companion-figure s0" id="comp-svg-ob" width="120" height="220" viewBox="0 0 100 200" fill="none">
+          <defs>
+            <linearGradient id="cg" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#9b8fff"/>
+              <stop offset="100%" stop-color="#6c5ce7"/>
+            </linearGradient>
+          </defs>
+          <circle cx="50" cy="28" r="22" fill="url(#cg)"/>
+          <rect x="43" y="48" width="14" height="14" rx="7" fill="url(#cg)"/>
+          <path class="comp-torso" d="M20 65 Q50 57 80 65 L76 138 Q63 148 50 150 Q37 148 24 138 Z" fill="url(#cg)"/>
+          <path d="M24 74 Q8 102 6 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+          <path d="M76 74 Q92 102 94 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+          <path d="M37 148 Q32 174 28 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+          <path d="M63 148 Q68 174 72 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="welcome-title">Tomo</div>
+      <div class="welcome-sub">あなたの伴走者</div>
+      <div class="welcome-desc">スマホを置いている間、あなたに似た誰かが隣で育っています。一緒に、現実を歩いていきましょう。</div>
+      <button class="btn-primary" onclick="obNext('welcome','name')">はじめる</button>
     </div>
-    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#6c5ce7,#f8a4c0);display:flex;align-items:center;justify-content:center;font-size:18px;">🌿</div>
   </div>
 
-  <!-- RING -->
-  <div class="ring-container">
-    <div class="ring-wrap">
-      <svg width="180" height="180" viewBox="0 0 180 180">
-        <circle cx="90" cy="90" r="75" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="12"/>
-        <circle cx="90" cy="90" r="75" fill="none" stroke="rgba(139,124,248,0.15)" stroke-width="12"
-          stroke-dasharray="471" stroke-dashoffset="0" stroke-linecap="round"
-          transform="rotate(-90 90 90)"/>
-        <circle cx="90" cy="90" r="75" fill="none" stroke="url(#grad)" stroke-width="12"
-          stroke-dasharray="471" stroke-dashoffset="200" stroke-linecap="round"
-          transform="rotate(-90 90 90)" id="progress-ring"/>
-        <defs>
-          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#6c5ce7"/>
-            <stop offset="100%" stop-color="#8b7cf8"/>
-          </linearGradient>
-        </defs>
+  <!-- Q1: NAME -->
+  <div class="ob-screen" id="ob-name">
+    <div class="ob-progress" id="prog-name"></div>
+    <div class="ob-companion-area">
+      <svg class="companion-figure s1" width="100" height="180" viewBox="0 0 100 200" fill="none">
+        <circle cx="50" cy="28" r="22" fill="url(#cg)"/>
+        <rect x="43" y="48" width="14" height="14" rx="7" fill="url(#cg)"/>
+        <path class="comp-torso" d="M20 65 Q50 57 80 65 L76 138 Q63 148 50 150 Q37 148 24 138 Z" fill="url(#cg)"/>
+        <path d="M24 74 Q8 102 6 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+        <path d="M76 74 Q92 102 94 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+        <path d="M37 148 Q32 174 28 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+        <path d="M63 148 Q68 174 72 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
       </svg>
-      <div class="ring-center">
-        <div class="ring-time" id="screen-time">2:34</div>
-        <div class="ring-label">TODAY'S USE</div>
+    </div>
+    <div class="ob-bubble">
+      <div class="ob-bubble-name">TOMO</div>
+      はじめまして。あなたの名前を教えてもらえますか？
+    </div>
+    <div class="ob-input-wrap">
+      <input type="text" id="input-name" placeholder="名前を入力" maxlength="20" oninput="checkNameInput()">
+    </div>
+    <button class="btn-primary" id="btn-name" disabled onclick="obSaveName()">次へ</button>
+  </div>
+
+  <!-- Q2: AGE -->
+  <div class="ob-screen" id="ob-age">
+    <div class="ob-progress" id="prog-age"></div>
+    <div class="ob-companion-area">
+      <svg class="companion-figure s2" width="100" height="180" viewBox="0 0 100 200" fill="none">
+        <circle cx="50" cy="28" r="22" fill="url(#cg)"/>
+        <rect x="43" y="48" width="14" height="14" rx="7" fill="url(#cg)"/>
+        <path class="comp-torso" d="M20 65 Q50 57 80 65 L76 138 Q63 148 50 150 Q37 148 24 138 Z" fill="url(#cg)"/>
+        <path d="M24 74 Q8 102 6 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+        <path d="M76 74 Q92 102 94 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+        <path d="M37 148 Q32 174 28 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+        <path d="M63 148 Q68 174 72 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="ob-bubble">
+      <div class="ob-bubble-name">TOMO</div>
+      ありがとう、<span id="bubble-name-age"></span>さん。伴走者をあなたに近づけたいので、何歳くらいか教えてもらえますか？
+    </div>
+    <div class="ob-options">
+      <button class="ob-opt" onclick="obSelect(this,'age','teen')"><span class="ob-opt-icon">🌱</span>10代</button>
+      <button class="ob-opt" onclick="obSelect(this,'age','twenties')"><span class="ob-opt-icon">🌿</span>20代</button>
+      <button class="ob-opt" onclick="obSelect(this,'age','thirties')"><span class="ob-opt-icon">🌳</span>30代</button>
+      <button class="ob-opt" onclick="obSelect(this,'age','forties')"><span class="ob-opt-icon">🏔️</span>40代以上</button>
+    </div>
+  </div>
+
+  <!-- Q3: GENDER -->
+  <div class="ob-screen" id="ob-gender">
+    <div class="ob-progress" id="prog-gender"></div>
+    <div class="ob-companion-area">
+      <svg class="companion-figure s3" width="100" height="180" viewBox="0 0 100 200" fill="none">
+        <circle cx="50" cy="28" r="22" fill="url(#cg)"/>
+        <rect x="43" y="48" width="14" height="14" rx="7" fill="url(#cg)"/>
+        <path class="comp-torso" d="M20 65 Q50 57 80 65 L76 138 Q63 148 50 150 Q37 148 24 138 Z" fill="url(#cg)"/>
+        <path d="M24 74 Q8 102 6 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+        <path d="M76 74 Q92 102 94 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+        <path d="M37 148 Q32 174 28 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+        <path d="M63 148 Q68 174 72 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="ob-bubble">
+      <div class="ob-bubble-name">TOMO</div>
+      もう少しだけ教えてください。
+    </div>
+    <div class="ob-options">
+      <button class="ob-opt" onclick="obSelect(this,'gender','male')"><span class="ob-opt-icon">♂</span>男性</button>
+      <button class="ob-opt" onclick="obSelect(this,'gender','female')"><span class="ob-opt-icon">♀</span>女性</button>
+      <button class="ob-opt" onclick="obSelect(this,'gender','other')"><span class="ob-opt-icon">◎</span>その他・答えたくない</button>
+    </div>
+  </div>
+
+  <!-- Q4: LIFE SITUATION -->
+  <div class="ob-screen" id="ob-life">
+    <div class="ob-progress" id="prog-life"></div>
+    <div class="ob-companion-area">
+      <svg class="companion-figure s4" width="100" height="180" viewBox="0 0 100 200" fill="none">
+        <circle cx="50" cy="28" r="22" fill="url(#cg)"/>
+        <rect x="43" y="48" width="14" height="14" rx="7" fill="url(#cg)"/>
+        <path class="comp-torso" d="M20 65 Q50 57 80 65 L76 138 Q63 148 50 150 Q37 148 24 138 Z" fill="url(#cg)"/>
+        <path d="M24 74 Q8 102 6 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+        <path d="M76 74 Q92 102 94 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+        <path d="M37 148 Q32 174 28 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+        <path d="M63 148 Q68 174 72 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="ob-bubble">
+      <div class="ob-bubble-name">TOMO</div>
+      今、どんな毎日を送っていますか？
+    </div>
+    <div class="ob-options">
+      <button class="ob-opt" onclick="obSelect(this,'life','student')"><span class="ob-opt-icon">📚</span>学生</button>
+      <button class="ob-opt" onclick="obSelect(this,'life','worker')"><span class="ob-opt-icon">💼</span>会社員・社会人</button>
+      <button class="ob-opt" onclick="obSelect(this,'life','freelance')"><span class="ob-opt-icon">💻</span>フリーランス・自営</button>
+      <button class="ob-opt" onclick="obSelect(this,'life','other')"><span class="ob-opt-icon">🌀</span>その他</button>
+    </div>
+  </div>
+
+  <!-- Q5: ESCAPE TRIGGER -->
+  <div class="ob-screen" id="ob-escape">
+    <div class="ob-progress" id="prog-escape"></div>
+    <div class="ob-companion-area">
+      <svg class="companion-figure s5" width="100" height="180" viewBox="0 0 100 200" fill="none">
+        <circle cx="50" cy="28" r="22" fill="url(#cg)"/>
+        <rect x="43" y="48" width="14" height="14" rx="7" fill="url(#cg)"/>
+        <path class="comp-torso" d="M20 65 Q50 57 80 65 L76 138 Q63 148 50 150 Q37 148 24 138 Z" fill="url(#cg)"/>
+        <path d="M24 74 Q8 102 6 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+        <path d="M76 74 Q92 102 94 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+        <path d="M37 148 Q32 174 28 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+        <path d="M63 148 Q68 174 72 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="ob-bubble">
+      <div class="ob-bubble-name">TOMO</div>
+      正直に教えてください。スマホを触りたくなるとき、たいてい何から逃げていると思いますか？
+    </div>
+    <div class="ob-options">
+      <button class="ob-opt" onclick="obSelect(this,'escape','work')"><span class="ob-opt-icon">😮‍💨</span>仕事・勉強のプレッシャー</button>
+      <button class="ob-opt" onclick="obSelect(this,'escape','relation')"><span class="ob-opt-icon">😔</span>人間関係の疲れ</button>
+      <button class="ob-opt" onclick="obSelect(this,'escape','future')"><span class="ob-opt-icon">😰</span>将来への不安</button>
+      <button class="ob-opt" onclick="obSelect(this,'escape','lonely')"><span class="ob-opt-icon">🫠</span>孤独感・虚しさ</button>
+    </div>
+  </div>
+
+  <!-- Q6: ASPIRATION -->
+  <div class="ob-screen" id="ob-aspire">
+    <div class="ob-progress" id="prog-aspire"></div>
+    <div class="ob-companion-area">
+      <svg class="companion-figure born" width="100" height="180" viewBox="0 0 100 200" fill="none">
+        <circle cx="50" cy="28" r="22" fill="url(#cg)"/>
+        <rect x="43" y="48" width="14" height="14" rx="7" fill="url(#cg)"/>
+        <path class="comp-torso" d="M20 65 Q50 57 80 65 L76 138 Q63 148 50 150 Q37 148 24 138 Z" fill="url(#cg)"/>
+        <path d="M24 74 Q8 102 6 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+        <path d="M76 74 Q92 102 94 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+        <path d="M37 148 Q32 174 28 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+        <path d="M63 148 Q68 174 72 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="ob-bubble">
+      <div class="ob-bubble-name">TOMO</div>
+      最後に一つだけ。1年後、どんな自分でいたいですか？
+    </div>
+    <div class="ob-options">
+      <button class="ob-opt" onclick="obSelect(this,'aspire','focus')"><span class="ob-opt-icon">🎯</span>もっと集中できる自分</button>
+      <button class="ob-opt" onclick="obSelect(this,'aspire','connect')"><span class="ob-opt-icon">🤝</span>大切な人と深くつながりたい</button>
+      <button class="ob-opt" onclick="obSelect(this,'aspire','pursue')"><span class="ob-opt-icon">🌟</span>やりたいことに向き合える自分</button>
+      <button class="ob-opt" onclick="obSelect(this,'aspire','calm')"><span class="ob-opt-icon">🌊</span>心の余裕を持てる自分</button>
+    </div>
+  </div>
+
+  <!-- GENERATING -->
+  <div class="ob-screen" id="ob-generating">
+    <div class="gen-screen">
+      <div class="companion-wrap" style="position:relative;" id="gen-companion-wrap">
+        <svg class="companion-figure born" id="comp-svg-gen" width="140" height="260" viewBox="0 0 100 200" fill="none">
+          <circle cx="50" cy="28" r="22" fill="url(#cg)"/>
+          <rect x="43" y="48" width="14" height="14" rx="7" fill="url(#cg)"/>
+          <path class="comp-torso" d="M20 65 Q50 57 80 65 L76 138 Q63 148 50 150 Q37 148 24 138 Z" fill="url(#cg)"/>
+          <path d="M24 74 Q8 102 6 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+          <path d="M76 74 Q92 102 94 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+          <path d="M37 148 Q32 174 28 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+          <path d="M63 148 Q68 174 72 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="gen-label">伴走者を生成しています</div>
+      <div class="gen-dots">
+        <div class="gen-dot"></div>
+        <div class="gen-dot"></div>
+        <div class="gen-dot"></div>
       </div>
     </div>
-    <div class="ring-goal">目標 <span>3時間</span> まであと <span id="remaining">26分</span></div>
   </div>
 
-  <!-- AI SUGGESTION -->
-  <div class="ai-card">
-    <div class="ai-header">
-      <div class="ai-dot"></div>
-      <div class="ai-name">MINDFUL AI</div>
-    </div>
-    <div class="ai-text" id="ai-suggestion">今日は「退屈」でスマホを開く回数が多いですね。代わりに深呼吸を3回してみましょう。5分あれば十分です。</div>
-    <div class="ai-actions">
-      <button class="ai-action" onclick="showAlternative()">代替行動を見る</button>
-      <button class="ai-action" onclick="logTrigger()">今の気分を記録</button>
-    </div>
-  </div>
-
-  <!-- BAR CHART -->
-  <div class="card">
-    <div class="card-label">今週のスクリーンタイム</div>
-    <div class="chart-row" id="weekly-chart"></div>
-    <div style="display:flex;justify-content:space-between;margin-top:4px;">
-      <span style="font-size:11px;color:var(--text3)">月</span>
-      <span style="font-size:11px;color:var(--text3)">火</span>
-      <span style="font-size:11px;color:var(--text3)">水</span>
-      <span style="font-size:11px;color:var(--text3)">木</span>
-      <span style="font-size:11px;color:var(--text3)">金</span>
-      <span style="font-size:11px;color:var(--text3)">土</span>
-      <span style="font-size:11px;color:var(--text3)">今日</span>
-    </div>
-  </div>
-
-  <!-- STREAK -->
-  <div class="card">
-    <div class="card-label">連続記録日数</div>
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:500;color:var(--green)">7</div>
-      <div style="font-size:13px;color:var(--text2);">日連続達成中 🔥</div>
-    </div>
-    <div class="streak-row" id="streak-row"></div>
-  </div>
-</div>
-
-<!-- PAGE: LOG -->
-<div class="page" id="page-log">
-  <div class="header">
-    <div class="header-title">依存トリガー<br>記録</div>
-  </div>
-
-  <div class="card">
-    <div class="card-label">今、なぜ手に取りましたか？</div>
-    <div class="card-sub" style="margin-bottom:14px;">正直に選んでください。記録するだけで気づきが生まれます。</div>
-    <div class="trigger-grid" id="trigger-grid">
-      <button class="trigger-btn" onclick="selectTrigger(this,'退屈')">
-        <div class="trigger-emoji">😑</div><div class="trigger-label">退屈</div>
-      </button>
-      <button class="trigger-btn" onclick="selectTrigger(this,'不安')">
-        <div class="trigger-emoji">😰</div><div class="trigger-label">不安・焦り</div>
-      </button>
-      <button class="trigger-btn" onclick="selectTrigger(this,'習慣')">
-        <div class="trigger-emoji">🔄</div><div class="trigger-label">何となく習慣</div>
-      </button>
-      <button class="trigger-btn" onclick="selectTrigger(this,'通知')">
-        <div class="trigger-emoji">🔔</div><div class="trigger-label">通知が来た</div>
-      </button>
-      <button class="trigger-btn" onclick="selectTrigger(this,'暇つぶし')">
-        <div class="trigger-emoji">⏳</div><div class="trigger-label">暇つぶし</div>
-      </button>
-      <button class="trigger-btn" onclick="selectTrigger(this,'孤独')">
-        <div class="trigger-emoji">🫠</div><div class="trigger-label">孤独感</div>
-      </button>
-      <button class="trigger-btn" onclick="selectTrigger(this,'ストレス')">
-        <div class="trigger-emoji">😤</div><div class="trigger-label">ストレス</div>
-      </button>
-      <button class="trigger-btn" onclick="selectTrigger(this,'先延ばし')">
-        <div class="trigger-emoji">🙈</div><div class="trigger-label">先延ばし</div>
-      </button>
-      <button class="trigger-btn" onclick="selectTrigger(this,'その他')">
-        <div class="trigger-emoji">💭</div><div class="trigger-label">その他</div>
-      </button>
-    </div>
-    <button class="btn" style="margin-top:8px;" onclick="saveTriggerLog()">記録する</button>
-  </div>
-
-  <!-- LOG LIST -->
-  <div class="card">
-    <div class="card-label">今日の記録</div>
-    <div id="log-list">
-      <div class="log-item">
-        <div class="log-dot" style="background:var(--amber)"></div>
-        <div class="log-time">08:23</div>
-        <div class="log-text">朝起きてすぐ</div>
-        <div class="log-trigger">習慣</div>
+  <!-- MEETING -->
+  <div class="ob-screen" id="ob-meeting" style="padding:0 24px 48px;">
+    <div class="meet-screen">
+      <div class="companion-wrap" style="position:relative;" id="meet-companion-wrap">
+        <svg class="companion-figure born" width="140" height="260" viewBox="0 0 100 200" fill="none">
+          <circle cx="50" cy="28" r="22" fill="url(#cg)"/>
+          <rect x="43" y="48" width="14" height="14" rx="7" fill="url(#cg)"/>
+          <path class="comp-torso" d="M20 65 Q50 57 80 65 L76 138 Q63 148 50 150 Q37 148 24 138 Z" fill="url(#cg)"/>
+          <path d="M24 74 Q8 102 6 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+          <path d="M76 74 Q92 102 94 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+          <path d="M37 148 Q32 174 28 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+          <path d="M63 148 Q68 174 72 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+        </svg>
       </div>
-      <div class="log-item">
-        <div class="log-dot" style="background:var(--red)"></div>
-        <div class="log-time">11:47</div>
-        <div class="log-text">仕事の合間に</div>
-        <div class="log-trigger">ストレス</div>
+      <div class="meet-name" id="meet-name">—</div>
+      <div class="meet-tag">あなたの伴走者</div>
+      <div class="meet-profile" id="meet-profile"></div>
+      <div class="ob-bubble" id="meet-first-msg" style="border-radius:18px;width:100%;"></div>
+      <button class="btn-primary" onclick="enterApp()" style="width:100%;">一緒に歩き始める</button>
+    </div>
+  </div>
+
+</div><!-- /onboard -->
+
+
+<!-- ══════════════════════════════
+     APP
+══════════════════════════════ -->
+<div id="app">
+
+  <!-- HOME -->
+  <div class="page active" id="page-home">
+    <div class="home-header">
+      <div>
+        <div class="home-greeting" id="home-greeting">おかえり</div>
+        <div class="home-name" id="home-username">—</div>
       </div>
-      <div class="log-item">
-        <div class="log-dot" style="background:var(--text3)"></div>
-        <div class="log-time">14:02</div>
-        <div class="log-text">食後</div>
-        <div class="log-trigger">退屈</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);" id="home-date"></div>
+    </div>
+
+    <div class="home-companion-section">
+      <div class="companion-wrap" style="position:relative;" id="home-comp-wrap">
+        <svg class="companion-figure born" id="comp-svg-home" width="160" height="290" viewBox="0 0 100 200" fill="none">
+          <circle cx="50" cy="28" r="22" fill="url(#cg)"/>
+          <rect x="43" y="48" width="14" height="14" rx="7" fill="url(#cg)"/>
+          <path class="comp-torso" d="M20 65 Q50 57 80 65 L76 138 Q63 148 50 150 Q37 148 24 138 Z" fill="url(#cg)"/>
+          <path d="M24 74 Q8 102 6 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+          <path d="M76 74 Q92 102 94 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+          <path d="M37 148 Q32 174 28 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+          <path d="M63 148 Q68 174 72 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+        </svg>
       </div>
-      <div class="log-item">
-        <div class="log-dot" style="background:var(--accent)"></div>
-        <div class="log-time">16:30</div>
-        <div class="log-text">作業に集中できなくて</div>
-        <div class="log-trigger">先延ばし</div>
+      <div class="companion-status">伴走者</div>
+      <div class="companion-name-home" id="home-comp-name">—</div>
+    </div>
+
+    <div class="home-stats">
+      <div class="stat-box">
+        <div class="stat-box-val" style="color:var(--accent)" id="stat-sessions">0</div>
+        <div class="stat-box-key">セッション</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-val" style="color:var(--green)" id="stat-minutes">0m</div>
+        <div class="stat-box-key">集中時間</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-val" style="color:var(--text2)" id="stat-streak">0</div>
+        <div class="stat-box-key">日連続</div>
       </div>
     </div>
+
+    <div class="card" id="home-comp-msg-card">
+      <div class="card-label" id="comp-msg-label">TOMO より</div>
+      <div style="font-size:14px;color:var(--text2);line-height:1.75;" id="home-comp-msg">...</div>
+    </div>
+
+    <button class="btn-primary" onclick="switchPage('focus', document.querySelector('[data-page=focus]'))">
+      フォーカスセッションを始める
+    </button>
   </div>
 
-  <!-- TRIGGER ANALYSIS -->
-  <div class="card">
-    <div class="card-label">今週のトリガー分析</div>
-    <div style="margin: 8px 0;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <span style="font-size:13px;">習慣・無意識</span>
-        <span style="font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;">38%</span>
-      </div>
-      <div class="progress-track"><div class="progress-fill" style="width:38%;background:var(--amber)"></div></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;margin-top:10px;">
-        <span style="font-size:13px;">退屈・暇つぶし</span>
-        <span style="font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;">27%</span>
-      </div>
-      <div class="progress-track"><div class="progress-fill" style="width:27%;background:var(--accent)"></div></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;margin-top:10px;">
-        <span style="font-size:13px;">ストレス・不安</span>
-        <span style="font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;">20%</span>
-      </div>
-      <div class="progress-track"><div class="progress-fill" style="width:20%;background:var(--red)"></div></div>
-    </div>
-    <div style="margin-top:12px;padding:12px;background:var(--surface2);border-radius:var(--r-sm);">
-      <div style="font-size:12px;color:var(--text2);line-height:1.6;">💡 <strong style="color:var(--text)">習慣的な使用</strong>が最多です。特に朝起きてすぐと就寝前が危険ゾーン。スマホをベッドの外に置くだけで改善できます。</div>
-    </div>
-  </div>
-</div>
+  <!-- FOCUS -->
+  <div class="page" id="page-focus">
 
-<!-- PAGE: CHALLENGE -->
-<div class="page" id="page-challenge">
-  <div class="header">
-    <div class="header-title">21日間<br>チャレンジ</div>
-    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);padding-bottom:4px;">DAY 7</div>
-  </div>
-
-  <div style="margin-bottom:16px;">
-    <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-      <span style="font-size:12px;color:var(--text2)">達成率</span>
-      <span style="font-size:12px;color:var(--accent);font-family:'JetBrains Mono',monospace">7/21日</span>
-    </div>
-    <div class="progress-track" style="height:8px;">
-      <div class="progress-fill" style="width:33%"></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-label">今日のミッション — Day 7</div>
-    <div id="missions">
-      <div class="mission-item" onclick="toggleMission(this)">
-        <div class="mission-check done">
-          <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="#0c0c10" stroke-width="2" stroke-linecap="round"/></svg>
+    <!-- SETUP STATE -->
+    <div class="focus-state active" id="fs-setup">
+      <div class="focus-setup-header">
+        <div style="font-family:'DM Serif Display',serif;font-size:26px;text-align:center;">フォーカス</div>
+        <div style="font-size:13px;color:var(--text2);text-align:center;margin-top:6px;">
+          集中している間、<span id="focus-comp-name-sub">—</span>が隣にいます
         </div>
-        <div class="mission-body">
-          <div class="mission-title done">朝起きてから30分、スマホを見ない</div>
-          <div class="mission-desc">代わりにコップ1杯の水を飲む</div>
-        </div>
       </div>
-      <div class="mission-item" onclick="toggleMission(this)">
-        <div class="mission-check done">
-          <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="#0c0c10" stroke-width="2" stroke-linecap="round"/></svg>
+
+      <div class="card">
+        <div class="card-label">集中時間</div>
+        <div class="duration-grid">
+          <div class="dur-btn" onclick="selectDur(this,10)">10<span>分</span></div>
+          <div class="dur-btn selected" onclick="selectDur(this,25)">25<span>分</span></div>
+          <div class="dur-btn" onclick="selectDur(this,45)">45<span>分</span></div>
+          <div class="dur-btn" onclick="selectDur(this,60)">60<span>分</span></div>
         </div>
-        <div class="mission-body">
-          <div class="mission-title done">食事中はスマホを別室に置く</div>
-          <div class="mission-desc">食事に集中すると満足感が上がる</div>
-        </div>
-      </div>
-      <div class="mission-item" onclick="toggleMission(this)">
-        <div class="mission-check"></div>
-        <div class="mission-body">
-          <div class="mission-title">トリガーを3回記録する</div>
-          <div class="mission-desc">気づきが最大の武器になる</div>
-        </div>
-      </div>
-      <div class="mission-item" onclick="toggleMission(this)">
-        <div class="mission-check"></div>
-        <div class="mission-body">
-          <div class="mission-title">就寝1時間前にスマホをオフ</div>
-          <div class="mission-desc">睡眠の質が劇的に改善される</div>
-        </div>
+        <button class="btn-primary" onclick="beginFocus()">始める</button>
       </div>
     </div>
+
+    <!-- RUNNING STATE -->
+    <div class="focus-state" id="fs-running">
+      <div style="padding:16px 0 0;">
+        <div class="leave-banner" id="leave-banner"></div>
+      </div>
+      <div class="session-wrap">
+        <div class="session-ring-wrap">
+          <svg width="220" height="220" viewBox="0 0 220 220" class="session-ring-svg">
+            <circle cx="110" cy="110" r="98" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="10"/>
+            <circle cx="110" cy="110" r="98" fill="none" stroke="rgba(139,124,248,0.08)" stroke-width="10"/>
+            <circle cx="110" cy="110" r="98" fill="none" stroke="url(#fg)" stroke-width="10"
+              stroke-dasharray="616" stroke-dashoffset="616" stroke-linecap="round"
+              transform="rotate(-90 110 110)" id="focus-ring"/>
+            <defs>
+              <linearGradient id="fg" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#6c5ce7"/>
+                <stop offset="100%" stop-color="#8b7cf8"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <svg class="companion-figure focus-alive" id="comp-svg-focus" width="110" height="200" viewBox="0 0 100 200" fill="none" style="position:relative;z-index:2;">
+            <circle cx="50" cy="28" r="22" fill="url(#cg)"/>
+            <rect x="43" y="48" width="14" height="14" rx="7" fill="url(#cg)"/>
+            <path class="comp-torso" d="M20 65 Q50 57 80 65 L76 138 Q63 148 50 150 Q37 148 24 138 Z" fill="url(#cg)"/>
+            <path d="M24 74 Q8 102 6 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+            <path d="M76 74 Q92 102 94 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+            <path d="M37 148 Q32 174 28 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+            <path d="M63 148 Q68 174 72 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="session-timer" id="focus-timer">25:00</div>
+        <div class="session-label">集中中 — <span id="focus-comp-name-run">—</span>が隣にいます</div>
+        <div style="width:100%;">
+          <div class="card" style="text-align:center;padding:14px;margin-bottom:12px;">
+            <div style="font-size:13px;color:var(--text2);line-height:1.7;" id="focus-tip">スマホを置いて、今この時間に集中しましょう。</div>
+          </div>
+          <button class="btn-danger" onclick="confirmAbandon()">セッションを中断する</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEAD STATE -->
+    <div class="focus-state" id="fs-dead">
+      <div class="session-wrap">
+        <svg class="companion-figure focus-dead" width="130" height="240" viewBox="0 0 100 200" fill="none">
+          <circle cx="50" cy="28" r="22" fill="url(#cg)"/>
+          <rect x="43" y="48" width="14" height="14" rx="7" fill="url(#cg)"/>
+          <path d="M20 65 Q50 57 80 65 L76 138 Q63 148 50 150 Q37 148 24 138 Z" fill="url(#cg)"/>
+          <path d="M24 74 Q8 102 6 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+          <path d="M76 74 Q92 102 94 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+          <path d="M37 148 Q32 174 28 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+          <path d="M63 148 Q68 174 72 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+        </svg>
+        <div class="session-timer dead" style="font-size:24px;margin-bottom:8px;">集中が途切れました</div>
+        <div class="session-label" id="dead-label">また一緒に歩き始めよう</div>
+        <div style="width:100%;margin-top:8px;">
+          <div class="card" style="text-align:center;padding:16px;margin-bottom:12px;background:rgba(255,107,107,0.04);border-color:rgba(255,107,107,0.12);">
+            <div style="font-size:13px;color:var(--text2);line-height:1.7;" id="dead-msg">次は最後まで一緒にいられますよ。</div>
+          </div>
+          <button class="btn-primary" onclick="showFocusState('setup')" style="margin-bottom:8px;">もう一度始める</button>
+          <button class="btn-ghost" onclick="switchPage('home',document.querySelector('[data-page=home]'))">ホームに戻る</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPLETE STATE -->
+    <div class="focus-state" id="fs-complete">
+      <div class="session-wrap">
+        <svg class="companion-figure born" width="150" height="274" viewBox="0 0 100 200" fill="none" style="filter:drop-shadow(0 0 36px rgba(0,214,143,0.9));">
+          <circle cx="50" cy="28" r="22" fill="url(#cg)"/>
+          <rect x="43" y="48" width="14" height="14" rx="7" fill="url(#cg)"/>
+          <path class="comp-torso" d="M20 65 Q50 57 80 65 L76 138 Q63 148 50 150 Q37 148 24 138 Z" fill="url(#cg)"/>
+          <path d="M24 74 Q8 102 6 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+          <path d="M76 74 Q92 102 94 132" stroke="url(#cg)" stroke-width="13" stroke-linecap="round"/>
+          <path d="M37 148 Q32 174 28 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+          <path d="M63 148 Q68 174 72 198" stroke="url(#cg)" stroke-width="14" stroke-linecap="round"/>
+        </svg>
+        <div class="session-timer complete" style="font-size:32px;margin-bottom:6px;">達成！</div>
+        <div class="session-label" id="complete-label">25分間、一緒にいられました</div>
+        <div style="width:100%;margin-top:8px;">
+          <div class="card" style="text-align:center;padding:18px;margin-bottom:12px;background:rgba(0,214,143,0.04);border-color:rgba(0,214,143,0.15);">
+            <div style="font-size:24px;margin-bottom:8px;">🎉</div>
+            <div style="font-size:14px;font-weight:500;color:var(--green);margin-bottom:6px;">二人で時間を積み重ねました</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.65;" id="complete-msg">また話しましょう。</div>
+          </div>
+          <button class="btn-green" onclick="goToChat()">話しかける</button>
+          <button class="btn-ghost" onclick="showFocusState('setup')">もう一度集中する</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page-focus -->
+
+  <!-- CHAT -->
+  <div class="page" id="page-chat">
+    <div class="chat-header">
+      <div class="chat-companion-avatar" id="chat-avatar">🌿</div>
+      <div class="chat-companion-info">
+        <div class="chat-companion-name-small" id="chat-comp-name">—</div>
+        <div class="chat-companion-status">あなたの伴走者 · 今ここにいます</div>
+      </div>
+    </div>
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-reply-options" id="chat-reply-options"></div>
+    <div class="chat-free-input" id="chat-free-input" style="display:none;">
+      <input type="text" id="chat-input" placeholder="メッセージを入力..." maxlength="200">
+      <button class="chat-send-btn" onclick="sendFreeMessage()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M2 8L14 8M14 8L9 3M14 8L9 13" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
   </div>
 
-  <!-- WEEK GRID -->
-  <div class="card">
-    <div class="card-label">21日間の記録</div>
-    <div id="challenge-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:8px;"></div>
-  </div>
+  <!-- BOTTOM NAV -->
+  <nav class="nav">
+    <button class="nav-item active" data-page="home" onclick="switchPage('home',this)">
+      <div class="nav-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M3 9.5L11 3L19 9.5V19a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/>
+        </svg>
+      </div>ホーム
+    </button>
+    <button class="nav-item" data-page="focus" onclick="switchPage('focus',this)">
+      <div class="nav-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="M11 7v4l3 3"/>
+        </svg>
+      </div>フォーカス
+    </button>
+    <button class="nav-item" data-page="chat" onclick="switchPage('chat',this)">
+      <div class="nav-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M4 4h14a1 1 0 011 1v9a1 1 0 01-1 1H8l-4 3V5a1 1 0 011-1z"/>
+        </svg>
+      </div>話す
+    </button>
+  </nav>
 
-  <div class="premium-banner">
-    <div class="premium-icon">✨</div>
-    <div class="premium-text">
-      <h4>プレミアムで全機能解放</h4>
-      <p>AIパーソナルアドバイス・詳細分析・コミュニティ</p>
-    </div>
-    <div class="badge-premium">¥700/月</div>
-  </div>
-</div>
+</div><!-- /app -->
 
-<!-- PAGE: PROFILE -->
-<div class="page" id="page-profile">
-  <div class="header">
-    <div class="header-title">プロフィール</div>
-  </div>
-
-  <div style="display:flex;flex-direction:column;align-items:center;padding:8px 0 24px;">
-    <div class="profile-avatar">🌿</div>
-    <div style="font-size:18px;font-weight:500;margin-bottom:4px;">ゲストユーザー</div>
-    <div style="font-size:13px;color:var(--text2);">7日間継続中 · フリープラン</div>
-  </div>
-
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-val" style="color:var(--green)">7</div>
-      <div class="stat-key">連続日数</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-val" style="color:var(--accent)">2.5h</div>
-      <div class="stat-key">平均削減</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-val" style="color:var(--amber)">24</div>
-      <div class="stat-key">記録回数</div>
-    </div>
-  </div>
-
-  <div class="premium-banner" style="cursor:pointer;" onclick="showToast('プレミアム機能は近日公開予定です！')">
-    <div class="premium-icon">👑</div>
-    <div class="premium-text">
-      <h4>プレミアムにアップグレード</h4>
-      <p>7日間無料でお試しください。いつでもキャンセル可能。</p>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-label">設定</div>
-    <div class="setting-row">
-      <span class="setting-label">毎日のリマインダー</span>
-      <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
-    </div>
-    <div class="setting-row">
-      <span class="setting-label">目標スクリーンタイム</span>
-      <span class="setting-val">3時間 ›</span>
-    </div>
-    <div class="setting-row">
-      <span class="setting-label">週次レポート</span>
-      <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
-    </div>
-    <div class="setting-row">
-      <span class="setting-label">ダークモード</span>
-      <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
-    </div>
-    <div class="setting-row" onclick="showToast('ログアウトしました')">
-      <span class="setting-label" style="color:var(--red)">ログアウト</span>
-    </div>
-  </div>
-</div>
-
-<!-- BOTTOM NAV -->
-<nav class="nav">
-  <button class="nav-item active" onclick="switchPage('home',this)">
-    <div class="nav-icon">
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M3 9.5L11 3L19 9.5V19a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/></svg>
-    </div>ホーム
-  </button>
-  <button class="nav-item" onclick="switchPage('log',this)">
-    <div class="nav-icon">
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5">
-        <rect x="3" y="3" width="16" height="16" rx="3"/>
-        <path d="M7 8h8M7 12h8M7 16h4"/></svg>
-    </div>記録
-  </button>
-  <button class="nav-item" onclick="switchPage('challenge',this)">
-    <div class="nav-icon">
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M11 2L13.5 8.5H20L14.5 12.5L16.5 19L11 15L5.5 19L7.5 12.5L2 8.5H8.5L11 2Z"/></svg>
-    </div>チャレンジ
-  </button>
-  <button class="nav-item" onclick="switchPage('profile',this)">
-    <div class="nav-icon">
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5">
-        <circle cx="11" cy="8" r="4"/>
-        <path d="M3 19c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-    </div>マイページ
-  </button>
-</nav>
-
-<!-- MODAL: ALTERNATIVE ACTIONS -->
-<div class="modal-overlay" id="modal-alt">
+<!-- MODAL: ABANDON -->
+<div class="modal-overlay" id="modal-abandon">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">今できる代替行動</div>
-    <div class="modal-sub">スマホの代わりに試してみましょう。どれか一つでも十分です。</div>
-    <div id="alt-actions">
-      <div class="card" style="margin-bottom:10px;">
-        <div style="font-size:22px;margin-bottom:8px;">🌬️</div>
-        <div class="card-title">4-7-8呼吸法</div>
-        <div class="card-sub">4秒吸って、7秒止めて、8秒で吐く。3回繰り返すと落ち着く。</div>
-      </div>
-      <div class="card" style="margin-bottom:10px;">
-        <div style="font-size:22px;margin-bottom:8px;">🚶</div>
-        <div class="card-title">5分間散歩</div>
-        <div class="card-sub">外に出て空を見るだけで気分がリセットされる。</div>
-      </div>
-      <div class="card" style="margin-bottom:16px;">
-        <div style="font-size:22px;margin-bottom:8px;">📝</div>
-        <div class="card-title">3つの感謝を書く</div>
-        <div class="card-sub">今日良かったことを3つメモするだけで幸福感が上がる。</div>
-      </div>
-    </div>
-    <button class="btn-ghost" onclick="closeModal('modal-alt')">閉じる</button>
-  </div>
-</div>
-
-<!-- MODAL: LOG TRIGGER -->
-<div class="modal-overlay" id="modal-log">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">今の気分を記録</div>
-    <div class="modal-sub">何が今スマホを開かせましたか？記録するだけで意識が変わります。</div>
-    <div class="trigger-grid" id="modal-trigger-grid">
-      <button class="trigger-btn" onclick="selectModalTrigger(this,'退屈')"><div class="trigger-emoji">😑</div><div class="trigger-label">退屈</div></button>
-      <button class="trigger-btn" onclick="selectModalTrigger(this,'不安')"><div class="trigger-emoji">😰</div><div class="trigger-label">不安</div></button>
-      <button class="trigger-btn" onclick="selectModalTrigger(this,'習慣')"><div class="trigger-emoji">🔄</div><div class="trigger-label">習慣</div></button>
-      <button class="trigger-btn" onclick="selectModalTrigger(this,'ストレス')"><div class="trigger-emoji">😤</div><div class="trigger-label">ストレス</div></button>
-      <button class="trigger-btn" onclick="selectModalTrigger(this,'孤独')"><div class="trigger-emoji">🫠</div><div class="trigger-label">孤独</div></button>
-      <button class="trigger-btn" onclick="selectModalTrigger(this,'先延ばし')"><div class="trigger-emoji">🙈</div><div class="trigger-label">先延ばし</div></button>
-    </div>
-    <div style="height:12px;"></div>
-    <button class="btn" onclick="saveModalTrigger()">記録して閉じる</button>
-    <button class="btn-ghost" onclick="closeModal('modal-log')">キャンセル</button>
+    <div class="modal-title">セッションを中断しますか？</div>
+    <div class="modal-sub" id="abandon-msg">離れてしまうと、伴走者も一人になります。本当に中断しますか？</div>
+    <button class="btn-primary" style="background:rgba(255,107,107,0.85);margin-bottom:8px;" onclick="doAbandon()">中断する</button>
+    <button class="btn-ghost" onclick="closeModal('modal-abandon')">続ける</button>
   </div>
 </div>
 
 <script>
-const days = ['月','火','水','木','金','土','今'];
-const hours = [3.5, 2.8, 4.2, 3.1, 2.6, 3.8, 2.6];
-const maxH = Math.max(...hours);
+// ── STATE ──
+let userData = {};
+let companion = {};
+let focusDuration = 25;
+let focusInterval = null;
+let focusSecsLeft = 0;
+let focusTotalSecs = 0;
+let leaveTs = null;
+const KILL_THRESH = 12000;
 
-const chart = document.getElementById('weekly-chart');
-days.forEach((d, i) => {
-  const pct = Math.round((hours[i] / maxH) * 100);
-  const isToday = i === 6;
-  const isGood = hours[i] <= 3;
-  const div = document.createElement('div');
-  div.className = 'bar-wrap';
-  div.innerHTML = `<div class="bar${isToday?' today':isGood?' good':''}" style="height:${pct}%"></div>`;
-  chart.appendChild(div);
-});
+const STEPS = ['name','age','gender','life','escape','aspire'];
+const STEP_TOTAL = STEPS.length;
 
-const streakRow = document.getElementById('streak-row');
-['月','火','水','木','金','土','今'].forEach((d, i) => {
-  const el = document.createElement('div');
-  el.className = 'streak-day' + (i < 6 ? ' done' : ' today');
-  el.textContent = d;
-  streakRow.appendChild(el);
-});
+// ── COMPANION NAMES ──
+const NAMES = {
+  male:   { teen:['そうた','はると','ゆうと'], twenties:['けんと','ゆうき','こうへい'], thirties:['だいき','みつる','たくや'], forties:['けんじ','ひろし','まさき'] },
+  female: { teen:['はな','ひな','こころ'],    twenties:['みお','ゆい','あかね'],       thirties:['まい','なな','さゆ'],      forties:['みき','あきこ','けいこ'] },
+  other:  { teen:['なつき','はるき'],          twenties:['さとり','かいと'],            thirties:['いつき','まなと'],         forties:['かずき','のぞむ'] },
+};
 
-const cgrid = document.getElementById('challenge-grid');
-for (let i = 1; i <= 21; i++) {
-  const el = document.createElement('div');
-  el.className = 'streak-day' + (i < 7 ? ' done' : i === 7 ? ' today' : '');
-  el.style.cssText = 'width:100%;height:32px;border-radius:6px;';
-  el.textContent = i;
-  cgrid.appendChild(el);
+const ESCAPE_DESC = {
+  work:     '仕事のプレッシャーで頭がいっぱいになることがある',
+  relation: '人間関係の疲れで、誰かと距離を置きたくなることがある',
+  future:   '将来のことを考えると、不安で動けなくなることがある',
+  lonely:   '孤独な気持ちを抱えながら、それを誰にも言えないことがある',
+};
+const ASPIRE_DESC = {
+  focus:   '少しずつ、集中できる時間を増やしていきたい',
+  connect: '大切な人たちとの時間を、もっと深くしたい',
+  pursue:  '本当にやりたいことに、向き合えるようになりたい',
+  calm:    '日常の中に、心の余裕を作っていきたい',
+};
+const FIRST_MSG = {
+  work:     'はじめまして。仕事のことで頭がいっぱいになること、私にもよくあります。今日、どんな気持ちでここに来ましたか？',
+  relation: 'はじめまして。人間関係の疲れ、私も知っています。誰かのことを考えすぎて、自分が消えそうになる感覚。今日は少し、話しましょう。',
+  future:   'はじめまして。将来のことって、考えれば考えるほど霧の中に入っていく感じがしませんか。私も同じです。今ここで、一緒にいます。',
+  lonely:   'はじめまして。孤独って、不思議ですよね。人の中にいても感じることがある。今日、あなたがここに来てくれて嬉しいです。',
+};
+
+const FOCUS_TIPS = [
+  'スマホから離れている今、あなたの中の何かが静かに育っています。',
+  '一つのことに向き合う時間が、やがて大きな変化を生みます。',
+  '集中が続くほど、隣にいる存在との時間も深まっていきます。',
+  'この沈黙の中に、あなたの本当の声があります。',
+];
+
+const CHAT_FLOW = {
+  work: [
+    { type:'companion', text:'今日のセッション、お疲れさまでした。仕事のこと、最近どんな感じですか？', replies:['少し落ち着いてきた','まだしんどい','考えたくない'] },
+    { type:'companion', text:'その感覚、もう少し聞かせてもらえますか？しんどいとき、スマホを触る前に何を感じていますか？', free:true },
+  ],
+  relation: [
+    { type:'companion', text:'セッション終わりましたね。最近、誰かのことで頭がいっぱいになることはありますか？', replies:['ある','あまりない','一人でいたい'] },
+    { type:'companion', text:'そういう時、スマホを見ることで何かが和らぎますか？それとも、余計に気になってしまいますか？', free:true },
+  ],
+  future: [
+    { type:'companion', text:'お疲れさまでした。集中できましたか？将来のこと、今どのくらい頭にありますか？', replies:['かなり気になってる','少しある','今は考えていない'] },
+    { type:'companion', text:'将来のことを考えるとき、一番最初に浮かぶ感情は何ですか？', free:true },
+  ],
+  lonely: [
+    { type:'companion', text:'セッション終わりましたね。今日一日、誰かと話しましたか？', replies:['話した','あまり話せなかった','一人だった'] },
+    { type:'companion', text:'一人でいる時間が長いとき、何をしていると少し楽になりますか？', free:true },
+  ],
+};
+
+// ── ONBOARDING ──
+function obNext(from, to) {
+  document.getElementById('ob-' + from).classList.remove('active');
+  const next = document.getElementById('ob-' + to);
+  next.classList.add('active');
+  renderProgress(to);
 }
 
-const now = new Date();
-const dateEl = document.getElementById('today-date');
-const days2 = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-dateEl.textContent = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${days2[now.getDay()]}`;
+function renderProgress(screenId) {
+  const idx = STEPS.indexOf(screenId);
+  if (idx < 0) return;
+  const progId = 'prog-' + screenId;
+  const el = document.getElementById(progId);
+  if (!el) return;
+  el.innerHTML = '';
+  STEPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'ob-prog-dot' + (i < idx ? ' done' : i === idx ? ' active' : '');
+    el.appendChild(d);
+  });
+}
+
+function checkNameInput() {
+  const v = document.getElementById('input-name').value.trim();
+  document.getElementById('btn-name').disabled = v.length === 0;
+}
+
+function obSaveName() {
+  const v = document.getElementById('input-name').value.trim();
+  if (!v) return;
+  userData.name = v;
+  document.getElementById('bubble-name-age').textContent = v;
+  obNext('name', 'age');
+}
+
+function obSelect(el, field, val) {
+  userData[field] = val;
+  const next = { age:'gender', gender:'life', life:'escape', escape:'aspire', aspire:'generating' };
+  const current = field === 'age' ? 'age' : field === 'gender' ? 'gender' : field === 'life' ? 'life' : field === 'escape' ? 'escape' : 'aspire';
+  // brief visual feedback
+  const parent = el.closest('.ob-options');
+  parent.querySelectorAll('.ob-opt').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  setTimeout(() => {
+    if (next[field] === 'generating') {
+      startGenerating();
+    } else {
+      obNext(current, next[field]);
+    }
+  }, 250);
+}
+
+function startGenerating() {
+  obNext('aspire', 'generating');
+  generateCompanion();
+  setTimeout(() => {
+    populateMeetScreen();
+    obNext('generating', 'meeting');
+  }, 2800);
+}
+
+function generateCompanion() {
+  const gender = userData.gender || 'other';
+  const age = userData.age || 'twenties';
+  const pool = NAMES[gender]?.[age] || NAMES.other.twenties;
+  const name = pool[Math.floor(Math.random() * pool.length)];
+  companion = {
+    name,
+    escape: userData.escape || 'lonely',
+    aspire: userData.aspire || 'calm',
+    escapeDesc: ESCAPE_DESC[userData.escape] || ESCAPE_DESC.lonely,
+    aspireDesc: ASPIRE_DESC[userData.aspire] || ASPIRE_DESC.calm,
+    firstMsg: FIRST_MSG[userData.escape] || FIRST_MSG.lonely,
+    totalMinutes: 0,
+    sessions: 0,
+    streak: 0,
+    chatHistory: [],
+    chatFlowIdx: 0,
+  };
+  save();
+}
+
+function populateMeetScreen() {
+  document.getElementById('meet-name').textContent = companion.name;
+  document.getElementById('meet-profile').innerHTML = `
+    <div class="meet-profile-row"><span class="meet-profile-icon">💭</span>${companion.escapeDesc}</div>
+    <div class="meet-profile-row"><span class="meet-profile-icon">🌱</span>${companion.aspireDesc}</div>
+  `;
+  document.getElementById('meet-first-msg').innerHTML = `
+    <div class="ob-bubble-name">${companion.name.toUpperCase()}</div>
+    ${companion.firstMsg}
+  `;
+}
+
+function enterApp() {
+  save();
+  document.getElementById('onboard').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  initApp();
+}
+
+// ── APP ──
+function initApp() {
+  const d = new Date();
+  const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  document.getElementById('home-date').textContent =
+    `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${days[d.getDay()]}`;
+
+  const h = d.getHours();
+  document.getElementById('home-greeting').textContent = h < 12 ? 'おはよう' : h < 18 ? 'こんにちは' : 'こんばんは';
+  document.getElementById('home-username').textContent = userData.name + 'さん';
+  document.getElementById('home-comp-name').textContent = companion.name;
+  document.getElementById('focus-comp-name-sub').textContent = companion.name;
+  document.getElementById('focus-comp-name-run').textContent = companion.name;
+  document.getElementById('chat-comp-name').textContent = companion.name;
+  document.getElementById('comp-msg-label').textContent = companion.name + ' より';
+  document.getElementById('home-comp-msg').textContent = companion.firstMsg;
+  updateStats();
+  initChat();
+}
 
 function switchPage(name, btn) {
+  if (focusInterval && name !== 'focus') {
+    showToast('🌟 フォーカス中です');
+    return;
+  }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
-  btn.classList.add('active');
+  if (btn) btn.classList.add('active');
 }
 
-let selectedTrigger = null;
-let modalTrigger = null;
+function updateStats() {
+  document.getElementById('stat-sessions').textContent = companion.sessions || 0;
+  const m = companion.totalMinutes || 0;
+  document.getElementById('stat-minutes').textContent = m >= 60 ? (m/60).toFixed(1)+'h' : m+'m';
+  document.getElementById('stat-streak').textContent = companion.streak || 0;
+}
 
-function selectTrigger(el, name) {
-  document.querySelectorAll('#trigger-grid .trigger-btn').forEach(b => b.classList.remove('selected'));
+// ── FOCUS ──
+function selectDur(el, mins) {
+  document.querySelectorAll('.dur-btn').forEach(d => d.classList.remove('selected'));
   el.classList.add('selected');
-  selectedTrigger = name;
+  focusDuration = mins;
 }
 
-function selectModalTrigger(el, name) {
-  document.querySelectorAll('#modal-trigger-grid .trigger-btn').forEach(b => b.classList.remove('selected'));
-  el.classList.add('selected');
-  modalTrigger = name;
+function showFocusState(state) {
+  document.querySelectorAll('.focus-state').forEach(s => s.classList.remove('active'));
+  document.getElementById('fs-' + state).classList.add('active');
 }
 
-function saveTriggerLog() {
-  if (!selectedTrigger) { showToast('トリガーを選んでください'); return; }
-  const list = document.getElementById('log-list');
-  const t = new Date();
-  const time = `${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;
-  const colors = {退屈:'var(--text3)',不安:'var(--accent)',習慣:'var(--amber)',通知:'var(--green)',暇つぶし:'var(--text3)',孤独:'var(--pink)',ストレス:'var(--red)',先延ばし:'var(--amber)',その他:'var(--text3)'};
-  const item = document.createElement('div');
-  item.className = 'log-item';
-  item.innerHTML = `<div class="log-dot" style="background:${colors[selectedTrigger]||'var(--text3)'}"></div><div class="log-time">${time}</div><div class="log-text">今記録</div><div class="log-trigger">${selectedTrigger}</div>`;
-  list.insertBefore(item, list.firstChild);
-  document.querySelectorAll('#trigger-grid .trigger-btn').forEach(b => b.classList.remove('selected'));
-  selectedTrigger = null;
-  showToast('✓ 記録しました！');
+function beginFocus() {
+  focusSecsLeft = focusDuration * 60;
+  focusTotalSecs = focusSecsLeft;
+  leaveTs = null;
+
+  document.getElementById('focus-timer').className = 'session-timer';
+  document.getElementById('focus-ring').style.strokeDashoffset = '616';
+  document.getElementById('leave-banner').classList.remove('show');
+  document.getElementById('focus-tip').textContent = FOCUS_TIPS[Math.floor(Math.random() * FOCUS_TIPS.length)];
+  document.getElementById('comp-svg-focus').className = 'companion-figure focus-alive';
+
+  showFocusState('running');
+  updateFocusDisplay();
+  focusInterval = setInterval(focusTick, 1000);
+
+  document.addEventListener('visibilitychange', onVisChange);
 }
 
-function saveModalTrigger() {
-  if (!modalTrigger) { showToast('トリガーを選んでください'); return; }
-  closeModal('modal-log');
-  showToast(`✓ 「${modalTrigger}」を記録しました`);
+function focusTick() {
+  focusSecsLeft = Math.max(0, focusSecsLeft - 1);
+  if (focusSecsLeft === 0) completeFocus();
+  else updateFocusDisplay();
 }
 
-function showAlternative() { document.getElementById('modal-alt').classList.add('open'); }
-function logTrigger() { document.getElementById('modal-log').classList.add('open'); }
+function updateFocusDisplay() {
+  const m = Math.floor(focusSecsLeft / 60);
+  const s = focusSecsLeft % 60;
+  document.getElementById('focus-timer').textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  const progress = 1 - focusSecsLeft / focusTotalSecs;
+  document.getElementById('focus-ring').style.strokeDashoffset = String(616 * (1 - progress));
+}
+
+function onVisChange() {
+  if (!focusInterval) return;
+  if (document.hidden) {
+    leaveTs = Date.now();
+  } else {
+    if (leaveTs !== null) {
+      const away = Date.now() - leaveTs;
+      leaveTs = null;
+      if (away > KILL_THRESH) {
+        killFocus();
+      } else {
+        const b = document.getElementById('leave-banner');
+        b.textContent = `⚠️ ${Math.round(away/1000)}秒離れていました。${companion.name}が待っていましたよ`;
+        b.classList.add('show');
+        setTimeout(() => b.classList.remove('show'), 3500);
+      }
+    }
+  }
+}
+
+function killFocus() {
+  clearInterval(focusInterval);
+  focusInterval = null;
+  document.removeEventListener('visibilitychange', onVisChange);
+
+  const elapsed = focusTotalSecs - focusSecsLeft;
+  const pct = Math.round(elapsed / focusTotalSecs * 100);
+  document.getElementById('dead-label').textContent = `${companion.name}も待っています`;
+  document.getElementById('dead-msg').textContent =
+    pct >= 80 ? 'あと少しでした。次は絶対に一緒にいられます。' :
+    pct >= 40 ? `${Math.floor(elapsed/60)}分間、一緒にいられました。少しずつ伸ばしていきましょう。` :
+    '小さな一歩でも、積み重ねることが大事です。';
+  showFocusState('dead');
+}
+
+function completeFocus() {
+  clearInterval(focusInterval);
+  focusInterval = null;
+  document.removeEventListener('visibilitychange', onVisChange);
+
+  companion.sessions = (companion.sessions || 0) + 1;
+  companion.totalMinutes = (companion.totalMinutes || 0) + focusDuration;
+  companion.streak = (companion.streak || 0) + 1;
+  save();
+  updateStats();
+
+  document.getElementById('complete-label').textContent = `${focusDuration}分間、一緒にいられました`;
+  document.getElementById('complete-msg').textContent = `${companion.name}と過ごした時間が、少しずつ積み重なっています。`;
+  showFocusState('complete');
+  showToast('🌟 セッション完了！');
+}
+
+function confirmAbandon() {
+  document.getElementById('modal-abandon').classList.add('open');
+}
+function doAbandon() {
+  closeModal('modal-abandon');
+  killFocus();
+}
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
 document.querySelectorAll('.modal-overlay').forEach(m => {
   m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
 });
 
-function toggleMission(el) {
-  const check = el.querySelector('.mission-check');
-  const title = el.querySelector('.mission-title');
-  const isDone = check.classList.contains('done');
-  if (isDone) {
-    check.classList.remove('done');
-    check.innerHTML = '';
-    title.classList.remove('done');
+function goToChat() {
+  showFocusState('setup');
+  switchPage('chat', document.querySelector('[data-page=chat]'));
+  addPostSessionChat();
+}
+
+// ── CHAT ──
+function initChat() {
+  const msgs = document.getElementById('chat-messages');
+  msgs.innerHTML = '';
+  addChatMsg('companion', companion.firstMsg);
+  setTimeout(() => showChatReplies(0), 600);
+}
+
+function addChatMsg(role, text) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg ' + role;
+  if (role === 'companion') {
+    div.innerHTML = `<div class="chat-msg-avatar"></div><div class="chat-msg-bubble">${text}</div>`;
   } else {
-    check.classList.add('done');
-    check.innerHTML = `<svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="#0c0c10" stroke-width="2" stroke-linecap="round"/></svg>`;
-    title.classList.add('done');
-    showToast('ミッション達成！🎉');
+    div.innerHTML = `<div class="chat-msg-bubble">${text}</div>`;
+  }
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showChatReplies(flowIdx) {
+  const flow = CHAT_FLOW[companion.escape] || CHAT_FLOW.lonely;
+  if (flowIdx >= flow.length) {
+    showFreeInput();
+    return;
+  }
+  const step = flow[flowIdx];
+  const opts = document.getElementById('chat-reply-options');
+  opts.innerHTML = '';
+  document.getElementById('chat-free-input').style.display = 'none';
+
+  if (step.replies) {
+    step.replies.forEach(r => {
+      const btn = document.createElement('button');
+      btn.className = 'chat-reply-opt';
+      btn.textContent = r;
+      btn.onclick = () => {
+        addChatMsg('user', r);
+        opts.innerHTML = '';
+        companion.chatFlowIdx = flowIdx + 1;
+        save();
+        setTimeout(() => {
+          const nextStep = flow[flowIdx + 1];
+          if (nextStep) {
+            addChatMsg('companion', nextStep.text);
+            setTimeout(() => showChatReplies(flowIdx + 1), 400);
+          } else {
+            showFreeInput();
+          }
+        }, 700);
+      };
+      opts.appendChild(btn);
+    });
+  } else if (step.free) {
+    showFreeInput();
   }
 }
 
+function showFreeInput() {
+  document.getElementById('chat-reply-options').innerHTML = '';
+  document.getElementById('chat-free-input').style.display = 'flex';
+  document.getElementById('chat-input').focus();
+}
+
+function sendFreeMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  addChatMsg('user', text);
+  document.getElementById('chat-free-input').style.display = 'none';
+  setTimeout(() => {
+    const responses = [
+      `「${text.slice(0,10)}${text.length>10?'…':''}」、聞かせてくれてありがとう。その気持ち、大切にしたいですね。`,
+      'その言葉、忘れずにいます。次に話す時にまた教えてください。',
+      'うん、そうか。あなたがそう感じているということを、私は知っておきたかった。',
+    ];
+    addChatMsg('companion', responses[Math.floor(Math.random() * responses.length)]);
+  }, 900);
+}
+
+function addPostSessionChat() {
+  const flow = CHAT_FLOW[companion.escape] || CHAT_FLOW.lonely;
+  const idx = companion.chatFlowIdx || 0;
+  if (idx < flow.length) {
+    addChatMsg('companion', flow[idx].text);
+    setTimeout(() => showChatReplies(idx), 400);
+  } else {
+    addChatMsg('companion', `${focusDuration}分間、一緒にいられましたね。今どんな気持ちですか？`);
+    setTimeout(() => showFreeInput(), 400);
+  }
+}
+
+// ── PERSIST ──
+function save() {
+  localStorage.setItem('tomo_user', JSON.stringify(userData));
+  localStorage.setItem('tomo_companion', JSON.stringify(companion));
+}
+
+function load() {
+  try {
+    const u = localStorage.getItem('tomo_user');
+    const c = localStorage.getItem('tomo_companion');
+    if (u) userData = JSON.parse(u);
+    if (c) companion = JSON.parse(c);
+    return !!(u && c && companion.name);
+  } catch(e) { return false; }
+}
+
+// ── TOAST ──
 let toastTimer;
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-const suggestions = [
-  '今日は「退屈」でスマホを開く回数が多いですね。代わりに深呼吸を3回してみましょう。',
-  'スクリーンタイムが昨日より15分少ないです。この調子を続けましょう！',
-  '夜21時以降のスマホ使用が睡眠を妨げています。今夜は早めに置きましょう。',
-  '「先延ばし」のトリガーが多いです。今すぐ5分だけ作業を始めてみて。',
-];
-document.getElementById('ai-suggestion').textContent = suggestions[Math.floor(Math.random() * suggestions.length)];
+// ── BOOT ──
+if (load()) {
+  document.getElementById('onboard').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  initApp();
+}
 </script>
 </body>
 </html>
