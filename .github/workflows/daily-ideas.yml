@@ -1,0 +1,27 @@
+name: daily-ideas
+on:
+  schedule:
+    - cron: "13 21 * * *"   # 毎日 06:13 JST
+  workflow_dispatch: {}      # 手動実行ボタン
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r news_idea_miner/requirements.txt
+      - run: python news_idea_miner/miner.py
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      - name: Commit report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add reports
+          git diff --cached --quiet || git commit -m "Daily ideas $(TZ=Asia/Tokyo date +%F)"
+          git push
