@@ -134,3 +134,12 @@ button.icon { background: none; border: none; color: var(--muted); padding: 4px 
 
 .auth { max-width: 380px; margin: 0 auto; padding: 48px 16px; display: flex; flex-direction: column; gap: 16px; }
 .auth h1 { text-align: center; }
+
+.grow { flex: 1; min-width: 0; }
+.photo { width: 100%; max-height: 320px; object-fit: cover; border-radius: 8px; }
+.ai-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.ai-rows li { display: flex; flex-direction: column; gap: 6px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.ai-rows li.off { opacity: 0.45; }
+.ai-rows input[type='checkbox'] { width: 20px; height: 20px; flex: none; }
+.grid5 { display: grid; gap: 6px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.grid5 input { padding: 8px 6px; }

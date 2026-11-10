@@ -3,7 +3,7 @@ import type { Repo } from './repo';
 
 const KEY = 'macro-app:v1';
 
-interface Data {
+export interface Data {
   profile: Profile | null;
   foods: Food[];
   meals: MealEntry[];
@@ -32,7 +32,6 @@ function mutate(fn: (d: Data) => void): Promise<void> {
 }
 
 export const localRepo: Repo = {
-  kind: 'local',
   getProfile: async () => load().profile,
   saveProfile: (p) => mutate((d) => void (d.profile = p)),
 
@@ -44,7 +43,6 @@ export const localRepo: Repo = {
   deleteFood: (id) => mutate((d) => void (d.foods = d.foods.filter((x) => x.id !== id))),
 
   listMeals: async (date) => load().meals.filter((m) => m.date === date),
-  listMealsInRange: async (from, to) => load().meals.filter((m) => m.date >= from && m.date <= to),
   addMeal: (e) => mutate((d) => void d.meals.push(e)),
   deleteMeal: (id) => mutate((d) => void (d.meals = d.meals.filter((x) => x.id !== id))),
 
@@ -55,3 +53,18 @@ export const localRepo: Repo = {
     }),
   deleteWeight: (date) => mutate((d) => void (d.weights = d.weights.filter((x) => x.date !== date))),
 };
+
+/** バックアップ用に全データを JSON 文字列として書き出す (APIキーは含めない) */
+export function exportData(): string {
+  return JSON.stringify({ app: 'macro-app', version: 1, exportedAt: new Date().toISOString(), data: load() }, null, 2);
+}
+
+/** バックアップ JSON を読み込み、現在のデータを置き換える */
+export function importData(json: string): void {
+  const parsed = JSON.parse(json) as { app?: string; data?: Partial<Data> };
+  const d = parsed.data;
+  if (parsed.app !== 'macro-app' || !d || !Array.isArray(d.meals) || !Array.isArray(d.foods) || !Array.isArray(d.weights)) {
+    throw new Error('このアプリのバックアップファイルではありません');
+  }
+  save({ profile: d.profile ?? null, foods: d.foods, meals: d.meals, weights: d.weights });
+}

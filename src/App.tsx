@@ -1,12 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { Session } from '@supabase/supabase-js';
 import { SEED_FOODS } from './data/seedFoods';
 import { calcTargets } from './lib/nutrition';
-import { localRepo } from './store/localRepo';
-import type { Repo } from './store/repo';
-import { createSupabaseRepo, supabase } from './store/supabaseRepo';
+import { localRepo as repo } from './store/localRepo';
 import type { Food, Profile } from './types';
-import { Auth } from './components/Auth';
 import { TodayView } from './components/TodayView';
 import { WeightView } from './components/WeightView';
 import { FoodsView } from './components/FoodsView';
@@ -21,45 +17,23 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 
 export function App() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [authReady, setAuthReady] = useState(!supabase);
-
-  useEffect(() => {
-    if (!supabase) return;
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setAuthReady(true);
-    });
-    const { data } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
-    return () => data.subscription.unsubscribe();
-  }, []);
-
-  if (!authReady) return <div className="center muted">読み込み中…</div>;
-  if (supabase && !session) return <Auth client={supabase} />;
-
-  const repo = supabase ? createSupabaseRepo(supabase) : localRepo;
-  return <Main key={session?.user.id ?? 'local'} repo={repo} email={session?.user.email} />;
-}
-
-function Main({ repo, email }: { repo: Repo; email?: string }) {
   const [tab, setTab] = useState<Tab>('today');
   const [profile, setProfile] = useState<Profile | null>(null);
   const [userFoods, setUserFoods] = useState<Food[]>([]);
   const [loaded, setLoaded] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // バックアップ復元後にプロフィールと食品を読み直す
+  const [dataVersion, setDataVersion] = useState(0);
 
-  const reloadFoods = useCallback(async () => setUserFoods(await repo.listFoods()), [repo]);
+  const reloadFoods = useCallback(async () => setUserFoods(await repo.listFoods()), []);
 
   useEffect(() => {
-    Promise.all([repo.getProfile(), repo.listFoods()])
-      .then(([p, f]) => {
-        setProfile(p);
-        setUserFoods(f);
-        if (!p) setTab('settings');
-      })
-      .catch((e: Error) => setError(e.message))
-      .finally(() => setLoaded(true));
-  }, [repo]);
+    Promise.all([repo.getProfile(), repo.listFoods()]).then(([p, f]) => {
+      setProfile(p);
+      setUserFoods(f);
+      if (!p && dataVersion === 0) setTab('settings');
+      setLoaded(true);
+    });
+  }, [dataVersion]);
 
   const foods = useMemo(() => [...userFoods, ...SEED_FOODS], [userFoods]);
   const targets = profile ? calcTargets(profile) : null;
@@ -74,11 +48,20 @@ function Main({ repo, email }: { repo: Repo; email?: string }) {
   return (
     <div className="app">
       <main className="content">
-        {error && <div className="error">{error}</div>}
-        {tab === 'today' && <TodayView repo={repo} foods={foods} targets={targets} onNeedProfile={() => setTab('settings')} />}
+        {tab === 'today' && (
+          <TodayView
+            repo={repo}
+            foods={foods}
+            targets={targets}
+            onNeedProfile={() => setTab('settings')}
+            onNeedKey={() => setTab('settings')}
+          />
+        )}
         {tab === 'weight' && <WeightView repo={repo} profile={profile} onProfileChange={saveProfile} />}
         {tab === 'foods' && <FoodsView repo={repo} foods={foods} onChange={reloadFoods} />}
-        {tab === 'settings' && <SettingsView profile={profile} onSave={saveProfile} repoKind={repo.kind} email={email} />}
+        {tab === 'settings' && (
+          <SettingsView profile={profile} onSave={saveProfile} onDataRestored={() => setDataVersion((v) => v + 1)} />
+        )}
       </main>
       <nav className="tabbar">
         {TABS.map((t) => (

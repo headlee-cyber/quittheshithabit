@@ -40,6 +40,8 @@ export interface MealEntry extends Macros {
   meal: MealType;
   name: string;
   grams: number | null; // 手入力の場合は null
+  /** 'ai' の場合は写真からのAI推定値 */
+  source?: 'ai';
 }
 
 export interface WeightEntry {

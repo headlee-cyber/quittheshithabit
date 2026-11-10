@@ -1,6 +1,8 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { getApiKey, MODEL, setApiKey } from '../lib/ai';
+import { today } from '../lib/date';
+import { exportData, importData } from '../store/localRepo';
 import { bmr, calcTargets, DEFAULT_KCAL_ADJUST, tdee } from '../lib/nutrition';
-import { supabase } from '../store/supabaseRepo';
 import type { Goal, Profile } from '../types';
 
 const ACTIVITY = [
@@ -31,12 +33,50 @@ const DEFAULT: Profile = {
 interface Props {
   profile: Profile | null;
   onSave: (p: Profile) => Promise<void>;
-  repoKind: 'local' | 'supabase';
-  email?: string;
+  onDataRestored: () => void;
 }
 
-export function SettingsView({ profile, onSave, repoKind, email }: Props) {
+export function SettingsView({ profile, onSave, onDataRestored }: Props) {
+  const [keyInput, setKeyInput] = useState('');
+  const [hasKey, setHasKey] = useState(() => !!getApiKey());
+  const [backupMsg, setBackupMsg] = useState<string | null>(null);
+  const restoreRef = useRef<HTMLInputElement>(null);
+
+  const saveKey = () => {
+    setApiKey(keyInput.trim());
+    setHasKey(!!keyInput.trim());
+    setKeyInput('');
+  };
+
+  const download = () => {
+    const blob = new Blob([exportData()], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `macro-backup-${today()}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    setBackupMsg('バックアップを書き出しました。');
+  };
+
+  const restore = async (file: File | undefined) => {
+    if (!file) return;
+    if (!confirm('現在のデータをバックアップの内容で置き換えます。よろしいですか？')) return;
+    try {
+      importData(await file.text());
+      setBackupMsg('復元しました。');
+      onDataRestored();
+    } catch (e) {
+      setBackupMsg(`復元できませんでした: ${(e as Error).message}`);
+    } finally {
+      if (restoreRef.current) restoreRef.current.value = '';
+    }
+  };
+
   const [p, setP] = useState<Profile>(profile ?? DEFAULT);
+  // バックアップ復元などで外からプロフィールが変わったらフォームに反映
+  useEffect(() => {
+    if (profile) setP(profile);
+  }, [profile]);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -156,17 +196,52 @@ export function SettingsView({ profile, onSave, repoKind, email }: Props) {
       </form>
 
       <div className="card stack">
-        <h2>データの保存先</h2>
-        {repoKind === 'supabase' ? (
-          <>
-            <p>クラウド (Supabase) に同期しています。{email && <span className="muted"> {email}</span>}</p>
-            <button onClick={() => supabase?.auth.signOut()}>ログアウト</button>
-          </>
+        <h2>AI (写真から推定)</h2>
+        {hasKey ? (
+          <div className="row">
+            <span className="grow">APIキー: 登録済み</span>
+            <button
+              onClick={() => {
+                if (!confirm('APIキーを削除しますか？')) return;
+                setApiKey('');
+                setHasKey(false);
+              }}
+            >
+              削除
+            </button>
+          </div>
         ) : (
-          <p className="muted">
-            この端末のブラウザ内に保存しています。クラウド同期するには、.env.local に Supabase の接続情報を設定してください（README 参照）。
-          </p>
+          <div className="row">
+            <input
+              type="password"
+              placeholder="sk-ant-..."
+              value={keyInput}
+              onChange={(e) => setKeyInput(e.target.value)}
+              autoComplete="off"
+              aria-label="Anthropic APIキー"
+            />
+            <button className="primary" onClick={saveKey} disabled={!keyInput.trim()}>
+              保存
+            </button>
+          </div>
         )}
+        <p className="muted small">
+          キーはこの端末のブラウザ内にだけ保存され、Anthropic への通信以外には使いません。万一に備え、Anthropic Console
+          で月の利用上限額を設定しておいてください。使用モデル: {MODEL}
+        </p>
+      </div>
+
+      <div className="card stack">
+        <h2>バックアップ</h2>
+        <p className="muted small">
+          データはこの端末のブラウザ内に保存されています。ブラウザのデータを消すと記録も消えるため、定期的に書き出してください（APIキーは含まれません）。
+        </p>
+        <div className="row">
+          <button onClick={download}>書き出す</button>
+          <button onClick={() => restoreRef.current?.click()}>復元する</button>
+          <input ref={restoreRef} type="file" accept="application/json,.json" hidden onChange={(e) => restore(e.target.files?.[0])} />
+        </div>
+        {backupMsg && <p className="small">{backupMsg}</p>}
       </div>
     </div>
   );

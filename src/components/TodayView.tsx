@@ -5,15 +5,17 @@ import type { Repo } from '../store/repo';
 import { MEAL_LABELS, type Food, type Macros, type MealEntry, type MealType } from '../types';
 import { AddMealForm } from './AddMealForm';
 import { MacroBars } from './MacroBars';
+import { PhotoEstimate } from './PhotoEstimate';
 
 interface Props {
   repo: Repo;
   foods: Food[];
   targets: Macros | null;
   onNeedProfile: () => void;
+  onNeedKey: () => void;
 }
 
-export function TodayView({ repo, foods, targets, onNeedProfile }: Props) {
+export function TodayView({ repo, foods, targets, onNeedProfile, onNeedKey }: Props) {
   const [date, setDate] = useState(today);
   const [entries, setEntries] = useState<MealEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -32,6 +34,10 @@ export function TodayView({ repo, foods, targets, onNeedProfile }: Props) {
     } catch (err) {
       setError((err as Error).message);
     }
+  };
+  const addMany = async (list: MealEntry[]) => {
+    for (const e of list) await repo.addMeal(e);
+    reload();
   };
   const remove = async (id: string) => {
     if (!confirm('この記録を削除しますか？')) return;
@@ -59,6 +65,8 @@ export function TodayView({ repo, foods, targets, onNeedProfile }: Props) {
         </div>
       )}
 
+      <PhotoEstimate date={date} onAdd={addMany} onNeedKey={onNeedKey} />
+
       <AddMealForm date={date} foods={foods} onAdd={add} />
 
       {(Object.keys(MEAL_LABELS) as MealType[]).map((m) => {
@@ -80,6 +88,7 @@ export function TodayView({ repo, foods, targets, onNeedProfile }: Props) {
                     <div>
                       {e.name}
                       {e.grams != null && <span className="muted small"> {e.grams}g</span>}
+                      {e.source === 'ai' && <span className="tag">AI推定</span>}
                     </div>
                     <div className="muted small num">
                       {e.kcal}kcal P{e.protein} F{e.fat} C{e.carbs}

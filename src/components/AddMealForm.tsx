@@ -3,7 +3,7 @@ import { kcalFromMacros, scaleFood, searchFoods } from '../lib/nutrition';
 import { newId } from '../lib/date';
 import { MEAL_LABELS, type Food, type MealEntry, type MealType } from '../types';
 
-function defaultMeal(): MealType {
+export function defaultMeal(): MealType {
   const h = new Date().getHours();
   if (h < 10) return 'breakfast';
   if (h < 15) return 'lunch';
