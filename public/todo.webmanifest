@@ -1,0 +1,13 @@
+{
+  "name": "音声 To Do",
+  "short_name": "音声ToDo",
+  "description": "声で追加・完了・削除できる To Do リスト",
+  "lang": "ja",
+  "id": "./todo/",
+  "start_url": "./todo/",
+  "scope": "./todo/",
+  "display": "standalone",
+  "background_color": "#0f1115",
+  "theme_color": "#0f1115",
+  "icons": [{ "src": "todo-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
