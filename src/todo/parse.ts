@@ -6,6 +6,8 @@ export interface Todo {
   done: boolean;
   /** 期限（ローカル日付 YYYY-MM-DD） */
   due?: string;
+  /** AI が見積もった所要時間（分） */
+  minutes?: number;
   createdAt: number;
 }
 
